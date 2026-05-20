@@ -708,18 +708,7 @@ const S = {
     autoRefresh: 30,
   }),
 
-  usuarios: DB.l('usuarios', [
-    {id:'u1',nome:'Administrador TI',cpf:'000.000.000-01',login:'admin.ti',senha:'Admin@123',setor:'ti',role:'admin',coren:'',tel:''},
-    {id:'u2',nome:'Admin Transporte',cpf:'000.000.000-02',login:'admin.transp',senha:'Admin@123',setor:'transp_op',role:'admin',coren:'',tel:''},
-    {id:'u3',nome:'Enf. Ana Souza',cpf:'123.456.789-00',login:'123.456.789-00',senha:'Enf@123',setor:'enfermagem',role:'user',coren:'COREN-SP 123456',tel:''},
-    {id:'u4',nome:'Enf. Carlos Lima',cpf:'987.654.321-00',login:'enf2',senha:'Enf@123',setor:'enfermagem',role:'user',coren:'COREN-SP 654321',tel:''},
-    {id:'u5',nome:'Hotelaria Geral',cpf:'',login:'hotelaria',senha:'Hot@123',setor:'hotelaria',role:'user',coren:'',tel:''},
-    {id:'u6',nome:'Portaria Principal',cpf:'',login:'portaria',senha:'Port@123',setor:'portaria',role:'user',coren:'',tel:''},
-    {id:'u7',nome:'NIR Gestão',cpf:'',login:'nir',senha:'Nir@123',setor:'nir',role:'user',coren:'',tel:''},
-    {id:'u8',nome:'Central de Transporte',cpf:'',login:'transp.op',senha:'Transp@123',setor:'transp_op',role:'user',coren:'',tel:''},
-    {id:'u9',nome:'Carlos Aux.',cpf:'',login:'aux1',senha:'Aux@123',setor:'transp_aux',role:'user',coren:'',tel:''},
-    {id:'u10',nome:'Marcos Aux.',cpf:'',login:'aux2',senha:'Aux@123',setor:'transp_aux',role:'user',coren:'',tel:''},
-  ]),
+  usuarios: DB.l('usuarios', []),
 
   leitos: DB.l('leitos', [
     {id:'A101',num:'A-101',ala:'Ala A — Internação Clínica',status:'busy',paciente:'M. Ferreira',obs:'Pós-op abdominal',cleanTs:null},
@@ -1775,4 +1764,21 @@ function trAuxiliares(c){
 
 /* ══════════════════════════════════════════════
    AUXILIAR DE TRANSPORTE
-══════════════════════════════════════════════ 
+══════════════════════════════════════════════ */
+function auxTarefas(c){
+  const minhas=S.transportes.filter(t=>t.auxId===S.user.id&&t.status==='active');
+  c.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Minhas Tarefas</div><div class="page-subtitle">${S.user.nome}</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:9px">
+    ${minhas.length?minhas.map(t=>`
+      <div class="req-card ${t.prio}">
+        <div class="req-head"><div class="req-ttl">${t.paciente}</div><span class="badge ${prioBadge(t.prio)}">${prioLbl(t.prio)}</span></div>
+        <div class="req-meta">
+          <span><i class="fas fa-map-marker-alt"></i>${t.origem}</span>
+          <span><i class="fas fa-flag-checkered"></i>${t.destino}</span>
+        </div>
+        ${t.equip?`<div style="font-size:11px;color:var(--muted);margin-bottom:7px"><i class="fas fa-wheelchair"></i> ${t.equip}</div>`:''}
+        ${t.obs?`<div style="font-size:11px;color:var(--orange);margin-bottom:7px"><i class="fas fa-exclamation-triangle"></i> ${t.obs}</div>`:''}
+        <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,(t.elapsed/900)*100)}%"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin:3px 0 8px;font-family:var(--mono)">Em rota há: ${Math.floor(t.elapsed/60)}min ${t.elapsed%60}s</div>
+        <button class="btn 
