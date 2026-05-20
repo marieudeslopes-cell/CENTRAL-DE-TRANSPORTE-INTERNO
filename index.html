@@ -249,22 +249,21 @@ tr:hover td{background:var(--surface2)}
     <div id="fPrimeiroAcesso" style="display:none">
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:#1e40af">
         <div style="font-weight:800;font-size:14px;margin-bottom:6px">🏥 Primeiro Acesso — Configuração Inicial</div>
-        Bem-vindo ao sistema! Como é o primeiro acesso, crie agora as senhas dos <strong>dois Administradores</strong> para liberar o sistema.
+        Defina agora o <strong>login</strong> e a <strong>senha</strong> dos dois Administradores do sistema.
+        Mínimo de <strong>6 caracteres</strong> por senha.
       </div>
 
       <!-- Admin TI -->
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:12px">
-        <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:10px">
-          💻 Administrador TI
-        </div>
+        <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:10px">💻 Administrador TI</div>
         <div class="form-group" style="margin-bottom:8px">
-          <label class="form-label">Login</label>
+          <label class="form-label">Login *</label>
           <input class="form-input" id="setup-ti-login" placeholder="Ex: admin.ti" value="admin.ti">
         </div>
         <div class="form-group" style="margin-bottom:8px">
-          <label class="form-label">Senha *</label>
+          <label class="form-label">Senha * (mín. 6 caracteres)</label>
           <div class="input-icon"><i class="fas fa-lock"></i>
-            <input class="form-input" id="setup-ti-senha" type="password" placeholder="Mínimo 8 caracteres">
+            <input class="form-input" id="setup-ti-senha" type="password" placeholder="Crie uma senha">
           </div>
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -276,18 +275,16 @@ tr:hover td{background:var(--surface2)}
       </div>
 
       <!-- Admin Transporte -->
-      <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-bottom:16px">
-        <div style="font-weight:700;font-size:13px;color:#5b21b6;margin-bottom:10px">
-          🚑 Administrador Central de Transporte
-        </div>
+      <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div style="font-weight:700;font-size:13px;color:#5b21b6;margin-bottom:10px">🚑 Administrador Central de Transporte</div>
         <div class="form-group" style="margin-bottom:8px">
-          <label class="form-label">Login</label>
+          <label class="form-label">Login *</label>
           <input class="form-input" id="setup-tr-login" placeholder="Ex: admin.transp" value="admin.transp">
         </div>
         <div class="form-group" style="margin-bottom:8px">
-          <label class="form-label">Senha *</label>
+          <label class="form-label">Senha * (mín. 6 caracteres)</label>
           <div class="input-icon"><i class="fas fa-lock"></i>
-            <input class="form-input" id="setup-tr-senha" type="password" placeholder="Mínimo 8 caracteres">
+            <input class="form-input" id="setup-tr-senha" type="password" placeholder="Crie uma senha">
           </div>
         </div>
         <div class="form-group" style="margin-bottom:0">
@@ -298,8 +295,8 @@ tr:hover td{background:var(--surface2)}
         </div>
       </div>
 
-      <div style="font-size:11px;color:#6b7280;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;margin-bottom:14px">
-        ⚠️ Guarde bem essas senhas. Após criadas, só poderão ser alteradas dentro do sistema.
+      <div style="font-size:11px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px;margin-bottom:14px">
+        ⚠️ <strong>Anote bem as senhas!</strong> Após criadas, só poderão ser alteradas dentro do sistema pelo Admin TI.
       </div>
 
       <button class="btn-login" onclick="salvarPrimeiroAcesso()">
@@ -623,7 +620,6 @@ function primeiroAcessoFeito(){
 window.addEventListener('DOMContentLoaded', ()=>{
   applyConfig();
   if(!primeiroAcessoFeito()){
-    // Primeiro acesso — mostra tela de criação de senhas
     document.getElementById('fLogin').style.display='none';
     document.getElementById('fPrimeiroAcesso').style.display='block';
   }
@@ -638,11 +634,15 @@ function salvarPrimeiroAcesso(){
   const trSenha2 = document.getElementById('setup-tr-senha2').value;
   const err = document.getElementById('loginErr');
 
+  // Validações
   if(!tiLogin||!tiSenha||!trLogin||!trSenha){
     err.textContent='Preencha todos os campos obrigatórios.'; err.classList.add('show'); return;
   }
-  if(tiSenha.length<8||trSenha.length<8){
-    err.textContent='As senhas devem ter no mínimo 8 caracteres.'; err.classList.add('show'); return;
+  if(tiSenha.length<6){
+    err.textContent='Senha do Admin TI deve ter no mínimo 6 caracteres.'; err.classList.add('show'); return;
+  }
+  if(trSenha.length<6){
+    err.textContent='Senha do Admin Transporte deve ter no mínimo 6 caracteres.'; err.classList.add('show'); return;
   }
   if(tiSenha!==tiSenha2){
     err.textContent='As senhas do Admin TI não coincidem.'; err.classList.add('show'); return;
@@ -654,30 +654,26 @@ function salvarPrimeiroAcesso(){
     err.textContent='Os dois admins devem ter logins diferentes.'; err.classList.add('show'); return;
   }
 
-  // Salva os admins com as senhas criadas
+  err.classList.remove('show');
+
+  // Cria os dois admins com as senhas definidas
   const admins = [
     {id:'u1',nome:'Administrador TI',cpf:'000.000.000-01',login:tiLogin,senha:tiSenha,setor:'ti',role:'admin',coren:'',tel:'',email:''},
     {id:'u2',nome:'Admin Transporte',cpf:'000.000.000-02',login:trLogin,senha:trSenha,setor:'transp_op',role:'admin',coren:'',tel:'',email:''},
   ];
 
-  // Carrega usuários existentes e garante que os admins estejam lá
-  const usuarios = DB.l('usuarios',[]);
-  admins.forEach(a=>{
-    const idx=usuarios.findIndex(u=>u.id===a.id);
-    if(idx>=0) usuarios[idx]=a; else usuarios.unshift(a);
-  });
-  DB.s('usuarios', usuarios);
+  // Salva no banco local
+  DB.s('usuarios', admins);
   DB.s('admins_criados', true);
 
-  err.classList.remove('show');
-
-  // Faz login automático como Admin TI após configurar
-  S.usuarios = usuarios;
+  // Atualiza estado e faz login automático como Admin TI
+  S.usuarios = admins;
   S.user = admins[0];
+
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appShell').style.display='flex';
   initApp();
-  toast('success','✅ Sistema configurado! Bem-vindo, Administrador TI.');
+  setTimeout(()=>toast('success','✅ Sistema configurado! Bem-vindo, '+admins[0].nome+'. Agora cadastre os demais usuários.'),800);
 }
 
 const S = {
@@ -1779,4 +1775,4 @@ function trAuxiliares(c){
 
 /* ══════════════════════════════════════════════
    AUXILIAR DE TRANSPORTE
-══════════════════════════════
+══════════════════════════════════════════════ 
