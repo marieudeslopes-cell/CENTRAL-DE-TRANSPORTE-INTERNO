@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HOSPITAL DA CIDADE — Sistema Integrado Hospitalar</title>
+
+<!-- ══ PWA META TAGS ══ -->
+<meta name="application-name" content="HOSPITAL DA CIDADE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HOSPITAL DA CIDADE">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a56db">
+<meta name="description" content="Sistema Integrado de Gestão Hospitalar — Leitos, Transporte, Hotelaria, NIR e Portaria">
+<meta name="msapplication-TileColor" content="#1a56db">
+<meta name="msapplication-tap-highlight" content="no">
+
+<!-- ══ MANIFEST INLINE (via JS) ══ -->
+<link rel="manifest" href="#" id="manifestLink">
+
+<!-- ══ ÍCONES PWA (SVG inline via data URI) ══ -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a56db'/><text y='.9em' font-size='80' x='10'>🏥</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a56db'/><text y='.9em' font-size='80' x='10'>🏥</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg:#f0f4f8; --surface:#fff; --surface2:#f7f9fc; --border:#e2e8f0;
+  --shadow:0 2px 16px rgba(15,30,60,.08); --shadow-lg:0 8px 40px rgba(15,30,60,.16);
+  --blue:#1a56db; --blue-lt:#ebf5ff;
+  --teal:#0694a2; --teal-lt:#e6fffa;
+  --green:#057a55; --green-lt:#def7ec;
+  --orange:#d03801; --orange-lt:#fff3e0;
+  --red:#c81e1e; --red-lt:#fde8e8;
+  --purple:#6c2bd9; --purple-lt:#f5f3ff;
+  --gray:#374151; --muted:#6b7280; --text:#111827;
+  --font:'Outfit',sans-serif; --mono:'JetBrains Mono',monospace;
+  --r:12px; --r-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+input,select,textarea,button{font-family:var(--font)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── LOGIN ── */
+#loginScreen{min-height:100vh;background:linear-gradient(135deg,#0f2044,#1a3a6e,#0a4b6e);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden}
+#loginScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(26,86,219,.3),transparent 50%),radial-gradient(circle at 80% 20%,rgba(6,148,162,.2),transparent 50%)}
+.login-card{background:rgba(255,255,255,.97);border-radius:20px;padding:40px;width:100%;max-width:460px;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;z-index:1;max-height:95vh;overflow-y:auto}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;color:#fff;margin-bottom:10px;box-shadow:0 8px 24px rgba(26,86,219,.35)}
+.login-logo h1{font-size:22px;font-weight:800}
+.login-logo p{font-size:11px;color:var(--muted);margin-top:3px}
+.login-tabs{display:flex;background:var(--bg);border-radius:var(--r-sm);padding:3px;margin-bottom:20px;gap:3px}
+.login-tab{flex:1;padding:7px;border:none;background:transparent;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}
+.login-tab.active{background:#fff;color:var(--blue);box-shadow:var(--shadow)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:5px}
+.form-input,.form-select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+.input-icon{position:relative}
+.input-icon i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+.input-icon .form-input{padding-left:36px}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),#1e40af);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:6px}
+.btn-login:hover{opacity:.9;transform:translateY(-1px)}
+.login-error{background:var(--red-lt);border:1px solid #f8b4b4;color:var(--red);padding:9px 13px;border-radius:var(--r-sm);font-size:12px;margin-bottom:14px;display:none}
+.login-error.show{display:block}
+.demo-box{margin-top:14px;padding:12px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.8}
+.demo-box strong{color:var(--gray);display:block;margin-bottom:4px}
+.demo-box code{background:#fff;padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:10px;color:var(--blue)}
+
+/* ── APP SHELL ── */
+#appShell{display:none;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.06);flex-shrink:0}
+.topbar-brand{display:flex;align-items:center;gap:9px}
+.topbar-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px}
+.topbar-name{font-weight:800;font-size:15px}
+.topbar-name span{color:var(--blue)}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sector-badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--green);background:var(--green-lt);padding:4px 9px;border-radius:20px}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:puls 1.5s infinite}
+@keyframes puls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.clock-display{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.btn-icon{width:34px;height:34px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .2s;font-size:13px;position:relative}
+.btn-icon:hover{border-color:var(--blue);color:var(--blue)}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;background:var(--red);border-radius:50%;border:2px solid #fff;display:none}
+.user-chip{display:flex;align-items:center;gap:7px;padding:3px 10px 3px 3px;background:var(--surface2);border:1px solid var(--border);border-radius:20px}
+.user-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff}
+.user-name{font-size:12px;font-weight:600;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-logout{padding:5px 12px;background:var(--red-lt);color:var(--red);border:1px solid #fecaca;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-logout:hover{background:var(--red);color:#fff}
+
+/* ── BODY ── */
+.app-body{display:flex;flex:1;overflow:hidden;height:calc(100vh - 58px)}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;transition:width .3s}
+@media(max-width:700px){.sidebar{width:50px}.sidebar .nav-label,.sidebar .nav-sec{display:none}}
+.nav-sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:14px 14px 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--r-sm);margin:1px 7px;cursor:pointer;transition:all .15s;color:var(--muted);font-size:13px;font-weight:500;border:none;background:transparent;width:calc(100% - 14px);text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--blue-lt);color:var(--blue);font-weight:700}
+.nav-item i{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+.nav-badge.g{background:var(--green)}
+.nav-badge.o{background:var(--orange)}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:16px}
+@media(max-width:480px){.content{padding:10px;gap:12px}}
+
+/* ── COMPONENTS ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.page-title{font-size:20px;font-weight:800}
+.page-subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:14px;color:var(--text)}
+.card-title i{color:var(--blue)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.kpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.kpi-num{font-size:24px;font-weight:800;font-family:var(--mono);line-height:1}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:#1e40af}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#046c4e}
+.btn-warning{background:var(--orange);color:#fff}
+.btn-danger{background:var(--red);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-sm{padding:6px 11px;font-size:11px}
+.btn-xs{padding:3px 9px;font-size:10px;border-radius:5px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:9px 11px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2)}
+td{padding:11px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%}
+.b-free{background:var(--green-lt);color:var(--green)}.b-free::before{background:var(--green)}
+.b-busy{background:var(--red-lt);color:var(--red)}.b-busy::before{background:var(--red)}
+.b-clean{background:var(--orange-lt);color:var(--orange)}.b-clean::before{background:var(--orange)}
+.b-reserved{background:var(--blue-lt);color:var(--blue)}.b-reserved::before{background:var(--blue)}
+.b-blocked{background:#f1f5f9;color:var(--muted)}.b-blocked::before{background:var(--muted)}
+.b-pend{background:var(--orange-lt);color:var(--orange)}.b-pend::before{background:var(--orange)}
+.b-prog{background:var(--blue-lt);color:var(--blue)}.b-prog::before{background:var(--blue)}
+.b-done{background:var(--green-lt);color:var(--green)}.b-done::before{background:var(--green)}
+.b-crit{background:var(--red-lt);color:var(--red)}.b-crit::before{background:var(--red)}
+.b-high{background:var(--orange-lt);color:var(--orange)}.b-high::before{background:var(--orange)}
+.b-norm{background:var(--blue-lt);color:var(--blue)}.b-norm::before{background:var(--blue)}
+.b-visit{background:var(--teal-lt);color:var(--teal)}.b-visit::before{background:var(--teal)}
+.b-alta{background:var(--purple-lt);color:var(--purple)}.b-alta::before{background:var(--purple)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border-radius:16px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:24px;box-shadow:var(--shadow-lg);transform:scale(.96) translateY(8px);transition:transform .2s}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:9px}
+.modal-footer{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.toast-container{position:fixed;bottom:16px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:9px;font-size:12px;font-weight:500;min-width:260px;max-width:340px;animation:tin .3s ease;border-left:4px solid}
+@keyframes tin{from{transform:translateX(100%);opacity:0}}
+.toast.success{border-left-color:var(--green)}.toast.success i{color:var(--green)}
+.toast.error{border-left-color:var(--red)}.toast.error i{color:var(--red)}
+.toast.info{border-left-color:var(--blue)}.toast.info i{color:var(--blue)}
+.toast.warning{border-left-color:var(--orange)}.toast.warning i{color:var(--orange)}
+.form-row{margin-bottom:13px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:480px){.form-row-2{grid-template-columns:1fr}}
+.form-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:4px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.form-textarea{resize:vertical;min-height:70px}
+
+/* ── LEITOS VISUAL ── */
+.bed-grid-v{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.bed-v{border-radius:10px;padding:11px 7px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+.bed-v:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.bed-v.free{background:var(--green-lt);border-color:#a7f3d0}
+.bed-v.busy{background:var(--red-lt);border-color:#fca5a5}
+.bed-v.cleaning{background:var(--orange-lt);border-color:#fcd34d;animation:bc 2s infinite}
+.bed-v.reserved{background:var(--blue-lt);border-color:#93c5fd}
+.bed-v.blocked{background:#f1f5f9;border-color:#cbd5e1}
+@keyframes bc{0%,100%{opacity:1}50%{opacity:.6}}
+.bed-v i{font-size:18px;display:block;margin-bottom:4px}
+.bed-v.free i{color:var(--green)}.bed-v.busy i{color:var(--red)}.bed-v.cleaning i{color:var(--orange)}.bed-v.reserved i{color:var(--blue)}.bed-v.blocked i{color:var(--muted)}
+.bv-num{font-weight:800;font-size:12px;font-family:var(--mono)}
+.bv-st{font-size:9px;color:var(--muted);margin-top:2px}
+.bv-pat{font-size:9px;color:var(--text);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ala-title{grid-column:1/-1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:6px 0 2px;border-top:1px solid var(--border);margin-top:4px}
+.ala-title:first-child{border-top:none;margin-top:0}
+
+/* ── REQ CARD ── */
+.req-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;border-left:4px solid var(--blue);box-shadow:var(--shadow);transition:all .2s}
+.req-card.critical{border-left-color:var(--red)}
+.req-card.high{border-left-color:var(--orange)}
+.req-card.normal{border-left-color:var(--blue)}
+.req-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+.req-ttl{font-weight:700;font-size:13px}
+.req-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:9px}
+.req-meta span{display:flex;align-items:center;gap:3px}
+.req-act{display:flex;gap:7px;flex-wrap:wrap}
+
+/* ── AUX CARD ── */
+.aux-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:11px;margin-bottom:7px}
+.aux-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));flex-shrink:0}
+.aux-info{flex:1;min-width:0}
+.aux-name{font-weight:700;font-size:13px}
+.aux-st{font-size:10px;color:var(--muted);margin-top:1px}
+.aux-loc{font-size:10px;font-family:var(--mono);color:var(--blue);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:3px;border-bottom:2px solid var(--border);margin-bottom:14px}
+.tab-btn{padding:7px 14px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty i{font-size:36px;margin-bottom:10px;display:block}
+.empty p{font-size:13px}
+
+/* ── PROG BAR ── */
+.prog-bar{height:4px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width 1s linear}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){.topbar{padding:0 10px}.topbar-name,.clock-display{display:none}.kpi-grid{grid-template-columns:1fr 1fr}.page-title{font-size:17px}.user-name{display:none}}
+@media(max-width:380px){.kpi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN ════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon" id="loginLogoIcon">
+        <img id="logoImgLogin" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:16px">
+        <i class="fas fa-hospital-alt" id="loginLogoIco"></i>
+      </div>
+      <h1 class="hospital-nome">HOSPITAL DA CIDADE</h1>
+      <p class="hospital-sub">Sistema Integrado de Gestão Hospitalar</p>
+    </div>
+
+    <div id="loginErr" class="login-error"></div>
+
+    <!-- TELA: PRIMEIRO ACESSO (criação de senha dos admins) -->
+    <div id="fPrimeiroAcesso" style="display:none">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:16px;font-size:12px;color:#1e40af">
+        <div style="font-weight:800;font-size:14px;margin-bottom:6px">🏥 Primeiro Acesso — Configuração Inicial</div>
+        Bem-vindo ao sistema! Como é o primeiro acesso, crie agora as senhas dos <strong>dois Administradores</strong> para liberar o sistema.
+      </div>
+
+      <!-- Admin TI -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:12px">
+        <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:10px">
+          💻 Administrador TI
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Login</label>
+          <input class="form-input" id="setup-ti-login" placeholder="Ex: admin.ti" value="admin.ti">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Senha *</label>
+          <div class="input-icon"><i class="fas fa-lock"></i>
+            <input class="form-input" id="setup-ti-senha" type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Confirmar Senha *</label>
+          <div class="input-icon"><i class="fas fa-lock"></i>
+            <input class="form-input" id="setup-ti-senha2" type="password" placeholder="Repita a senha">
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Transporte -->
+      <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-weight:700;font-size:13px;color:#5b21b6;margin-bottom:10px">
+          🚑 Administrador Central de Transporte
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Login</label>
+          <input class="form-input" id="setup-tr-login" placeholder="Ex: admin.transp" value="admin.transp">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Senha *</label>
+          <div class="input-icon"><i class="fas fa-lock"></i>
+            <input class="form-input" id="setup-tr-senha" type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Confirmar Senha *</label>
+          <div class="input-icon"><i class="fas fa-lock"></i>
+            <input class="form-input" id="setup-tr-senha2" type="password" placeholder="Repita a senha">
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#6b7280;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;margin-bottom:14px">
+        ⚠️ Guarde bem essas senhas. Após criadas, só poderão ser alteradas dentro do sistema.
+      </div>
+
+      <button class="btn-login" onclick="salvarPrimeiroAcesso()">
+        <i class="fas fa-shield-halved"></i> Criar Senhas e Entrar no Sistema
+      </button>
+    </div>
+
+    <!-- TELA: LOGIN NORMAL -->
+    <div id="fLogin">
+      <div class="login-tabs" style="margin-bottom:16px">
+        <button class="login-tab active" onclick="setTab('login')">Entrar no Sistema</button>
+        <button class="login-tab" onclick="setTab('forgot')">Recuperar Senha</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Login (CPF ou Usuário)</label>
+        <div class="input-icon"><i class="fas fa-user"></i>
+          <input class="form-input" id="lUser" placeholder="CPF ou login" autocomplete="username"
+            onkeydown="if(event.key==='Enter')document.getElementById('lPass').focus()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <div class="input-icon"><i class="fas fa-lock"></i>
+          <input class="form-input" id="lPass" type="password" placeholder="••••••••"
+            autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+      </div>
+      <button class="btn-login" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt"></i> Acessar Sistema
+      </button>
+    </div>
+
+    <!-- TELA: RECUPERAR SENHA -->
+    <div id="fForgot" style="display:none">
+      <div class="login-tabs" style="margin-bottom:16px">
+        <button class="login-tab" onclick="setTab('login')">Entrar no Sistema</button>
+        <button class="login-tab active" onclick="setTab('forgot')">Recuperar Senha</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CPF cadastrado</label>
+        <div class="input-icon"><i class="fas fa-id-card"></i>
+          <input class="form-input" placeholder="000.000.000-00">
+        </div>
+      </div>
+      <button class="btn-login" onclick="toast('info','Contate o Administrador TI para redefinir sua senha')">
+        Solicitar Recuperação
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ APP SHELL ════ -->
+<div id="appShell">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo" id="topbarLogo">
+        <img id="logoImgTop" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px">
+        <span id="topbarInitials">HC</span>
+      </div>
+      <span class="topbar-name hospital-nome">HOSPITAL DA CIDADE</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-pill"><div class="live-dot"></div>AO VIVO</div>
+      <div class="clock-display" id="clock">--:--:--</div>
+      <span class="sector-badge" id="sectorBadge"></span>
+      <button class="btn-icon" onclick="openNotif()" id="notifBtn">
+        <i class="fas fa-bell"></i>
+        <span class="notif-dot" id="notifDot"></span>
+      </button>
+      <div class="user-chip">
+        <div class="user-avatar" id="userAv"></div>
+        <span class="user-name" id="userName"></span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+  <div class="app-body">
+    <nav class="sidebar" id="sidebar"></nav>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- ════ MODAIS ════ -->
+
+<!-- Notificações -->
+<div class="modal-overlay" id="mNotif">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title"><i class="fas fa-bell" style="color:var(--blue)"></i> Notificações</div>
+    <div id="notifBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="limparNotif()">Limpar</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('mNotif')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cadastro Usuário -->
+<div class="modal-overlay" id="mCadastro">
+  <div class="modal">
+    <div class="modal-title"><i class="fas fa-user-plus" style="color:var(--blue)"></i> <span id="mCadTitulo">Cadastrar Usuário</span></div>
+    <div class="form-row"><label class="form-label">Nome Completo *</label><input class="form-input" id="c-nome" placeholder="Nome completo"></div>
+    <div class="form-row"><label class="form-label">CPF *</label><input class="form-input" id="c-cpf" placeholder="000.000.000-00" oninput="maskCPF(this)"></div>
+    <div class="form-row" id="c-coren-row" style="display:none">
+      <label class="form-label">COREN *</label><input class="form-input" id="c-coren" placeholder="COREN-XX 000000">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Setor *</label>
+      <select class="form-select" id="c-setor" onchange="onCadSetorChange()">
+        <option value="">Selecionar setor...</option>
+        <option value="enfermagem">Enfermagem</option>
+        <option value="hotelaria">Hotelaria</option>
+        <option value="portaria">Portaria</option>
+        <option value="nir">NIR</option>
+        <option value="transp_op">Central de Transporte (Operador)</option>
+        <option value="transp_aux">Auxiliar de Transporte</option>
+        <option value="ti">TI / Administração</option>
+      </select>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Login *</label><input class="form-input" id="c-login" placeholder="login único"></div>
+      <div class="form-row" style="margin:0"><label class="form-label">Senha Inicial *</label><input class="form-input" id="c-senha" type="password" placeholder="Mín. 8 caracteres"></div>
+    </div>
+    <div class="form-row"><label class="form-label">Telefone</label><input class="form-input" id="c-tel" placeholder="(00) 00000-0000"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mCadastro')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCadastro()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nova Solicitação Transporte -->
+<div class="modal-overlay" id="mTransp">
+  <div class="modal">
+    <div class="modal-title"><i class="fas fa-ambulance" style="color:var(--purple)"></i> Solicitar Transporte</div>
+    <div class="form-row"><label class="form-label">Paciente *</label><input class="form-input" id="t-pac" placeholder="Nome completo do paciente"></div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Origem *</label>
+        <select class="form-select" id="t-orig"><option value="">Selecionar...</option></select>
+      </div>
+      <div class="form-row" style="margin:0"><label class="form-label">Destino *</label>
+        <select class="form-select" id="t-dest"><option value="">Selecionar...</option></select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Prioridade</label>
+        <select class="form-select" id="t-prio">
+          <option value="normal">Normal</option>
+          <option value="high">Alta</option>
+          <option value="critical">Crítica — Urgência</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin:0"><label class="form-label">Equipamento</label>
+        <select class="form-select" id="t-equip">
+          <option value="">Nenhum</option>
+          <option>Cadeira de Rodas</option><option>Maca</option>
+          <option>Maca + Monitor Cardíaco</option>
+          <option>Suporte de O₂</option><option>Incubadora</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row"><label class="form-label">Observações Clínicas</label>
+      <textarea class="form-textarea" id="t-obs" placeholder="Jejum, isolamento, acesso venoso..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mTransp')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitTransp()"><i class="fas fa-paper-plane"></i> Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nova Solicitação Hotelaria -->
+<div class="modal-overlay" id="mHotel">
+  <div class="modal">
+    <div class="modal-title"><i class="fas fa-broom" style="color:var(--orange)"></i> Solicitar Hotelaria</div>
+    <div class="form-row"><label class="form-label">Tipo de Solicitação *</label>
+      <select class="form-select" id="h-tipo" onchange="onHTipo()">
+        <option value="">Selecionar...</option>
+        <option value="higienizacao_leito">Higienização de Leito</option>
+        <option value="limpeza_enfermaria">Limpeza de Enfermaria</option>
+        <option value="mobiliario">Solicitação de Mobiliário</option>
+        <option value="roupa_cama">Troca de Roupa de Cama</option>
+        <option value="terminal">Limpeza Terminal (Alta/Óbito)</option>
+      </select>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Leito / Local *</label>
+        <select class="form-select" id="h-leito"><option value="">Selecionar...</option></select>
+      </div>
+      <div class="form-row" style="margin:0"><label class="form-label">Prioridade</label>
+        <select class="form-select" id="h-prio">
+          <option value="normal">Normal</option><option value="high">Alta</option><option value="critical">Urgente</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" id="h-mob-row" style="display:none">
+      <label class="form-label">Mobiliário Solicitado</label>
+      <input class="form-input" id="h-mob" placeholder="Ex: 2 cadeiras, 1 poltrona">
+    </div>
+    <div class="form-row"><label class="form-label">Observações</label>
+      <textarea class="form-textarea" id="h-obs" placeholder="Detalhes adicionais..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mHotel')">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitHotel()"><i class="fas fa-paper-plane"></i> Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Atribuir Auxiliar -->
+<div class="modal-overlay" id="mAtrib">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title"><i class="fas fa-user-check" style="color:var(--purple)"></i> Atribuir Auxiliar</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px" id="atribDesc"></p>
+    <div id="atribList"></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('mAtrib')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Modal Leito -->
+<div class="modal-overlay" id="mLeito">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title"><i class="fas fa-bed" style="color:var(--blue)"></i> Leito <span id="leitoNum"></span></div>
+    <div id="leitoInfo" style="margin-bottom:14px"></div>
+    <div class="form-row"><label class="form-label">Status</label>
+      <select class="form-select" id="l-status">
+        <option value="free">✅ Livre</option>
+        <option value="busy">🔴 Ocupado</option>
+        <option value="cleaning">🟡 Em Higienização</option>
+        <option value="reserved">🔵 Reservado</option>
+        <option value="blocked">⛔ Bloqueado</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">Paciente (se ocupado/reservado)</label>
+      <input class="form-input" id="l-pac" placeholder="Nome do paciente">
+    </div>
+    <div class="form-row"><label class="form-label">Observação</label>
+      <input class="form-input" id="l-obs" placeholder="Motivo, instrução...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mLeito')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarLeito()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Registro Visita / Entrada Portaria -->
+<div class="modal-overlay" id="mVisita">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title"><i class="fas fa-person-walking-arrow-right" style="color:var(--teal)"></i> <span id="mVisitaTitulo">Registrar Entrada</span></div>
+    <div class="form-row"><label class="form-label">Nome do Visitante / Acompanhante *</label>
+      <input class="form-input" id="v-nome" placeholder="Nome completo">
+    </div>
+    <div class="form-row"><label class="form-label">Documento (RG ou CPF)</label>
+      <input class="form-input" id="v-doc" placeholder="000.000.000-00">
+    </div>
+    <div class="form-row"><label class="form-label">Paciente Visitado *</label>
+      <select class="form-select" id="v-pac"><option value="">Selecionar paciente...</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Tipo</label>
+      <select class="form-select" id="v-tipo">
+        <option value="visitante">Visitante</option>
+        <option value="acompanhante">Acompanhante</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">Observação</label>
+      <input class="form-input" id="v-obs" placeholder="Autorização especial, restrição...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mVisita')">Cancelar</button>
+      <button class="btn btn-teal" onclick="salvarVisita()"><i class="fas fa-check"></i> Registrar Entrada</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Internação NIR -->
+<div class="modal-overlay" id="mInternar">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title"><i class="fas fa-user-plus" style="color:var(--green)"></i> Registrar Nova Internação</div>
+    <div class="form-row"><label class="form-label">Nome do Paciente *</label>
+      <input class="form-input" id="i-pac" placeholder="Nome completo">
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Leito Destino *</label>
+        <select class="form-select" id="i-leito"><option value="">Selecionar leito livre...</option></select>
+      </div>
+      <div class="form-row" style="margin:0"><label class="form-label">Data de Entrada</label>
+        <input class="form-input" id="i-data" type="date">
+      </div>
+    </div>
+    <div class="form-row"><label class="form-label">Acompanhante</label>
+      <input class="form-input" id="i-acomp" placeholder="Nome do acompanhante (opcional)">
+    </div>
+    <div class="form-row"><label class="form-label">Diagnóstico / Obs. Clínica</label>
+      <textarea class="form-textarea" id="i-obs" placeholder="Diagnóstico principal, observações..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mInternar')">Cancelar</button>
+      <button class="btn btn-success" onclick="salvarInternacao()"><i class="fas fa-check"></i> Internar Paciente</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════ JAVASCRIPT ════ -->
+<script>
+/* ══════════════════════════════════════════════
+   BANCO DE DADOS
+══════════════════════════════════════════════ */
+const DB = {
+  s(k,v){ try{ localStorage.setItem('hf3_'+k, JSON.stringify(v)); }catch(e){} },
+  l(k,d){ try{ const v=localStorage.getItem('hf3_'+k); return v!==null?JSON.parse(v):d; }catch(e){ return d; } }
+};
+
+// Verifica se o primeiro acesso já foi configurado
+function primeiroAcessoFeito(){
+  return DB.l('admins_criados', false);
+}
+
+// Ao carregar a página, decide qual tela mostrar
+window.addEventListener('DOMContentLoaded', ()=>{
+  applyConfig();
+  if(!primeiroAcessoFeito()){
+    // Primeiro acesso — mostra tela de criação de senhas
+    document.getElementById('fLogin').style.display='none';
+    document.getElementById('fPrimeiroAcesso').style.display='block';
+  }
+});
+
+function salvarPrimeiroAcesso(){
+  const tiLogin  = document.getElementById('setup-ti-login').value.trim();
+  const tiSenha  = document.getElementById('setup-ti-senha').value;
+  const tiSenha2 = document.getElementById('setup-ti-senha2').value;
+  const trLogin  = document.getElementById('setup-tr-login').value.trim();
+  const trSenha  = document.getElementById('setup-tr-senha').value;
+  const trSenha2 = document.getElementById('setup-tr-senha2').value;
+  const err = document.getElementById('loginErr');
+
+  if(!tiLogin||!tiSenha||!trLogin||!trSenha){
+    err.textContent='Preencha todos os campos obrigatórios.'; err.classList.add('show'); return;
+  }
+  if(tiSenha.length<8||trSenha.length<8){
+    err.textContent='As senhas devem ter no mínimo 8 caracteres.'; err.classList.add('show'); return;
+  }
+  if(tiSenha!==tiSenha2){
+    err.textContent='As senhas do Admin TI não coincidem.'; err.classList.add('show'); return;
+  }
+  if(trSenha!==trSenha2){
+    err.textContent='As senhas do Admin Transporte não coincidem.'; err.classList.add('show'); return;
+  }
+  if(tiLogin===trLogin){
+    err.textContent='Os dois admins devem ter logins diferentes.'; err.classList.add('show'); return;
+  }
+
+  // Salva os admins com as senhas criadas
+  const admins = [
+    {id:'u1',nome:'Administrador TI',cpf:'000.000.000-01',login:tiLogin,senha:tiSenha,setor:'ti',role:'admin',coren:'',tel:'',email:''},
+    {id:'u2',nome:'Admin Transporte',cpf:'000.000.000-02',login:trLogin,senha:trSenha,setor:'transp_op',role:'admin',coren:'',tel:'',email:''},
+  ];
+
+  // Carrega usuários existentes e garante que os admins estejam lá
+  const usuarios = DB.l('usuarios',[]);
+  admins.forEach(a=>{
+    const idx=usuarios.findIndex(u=>u.id===a.id);
+    if(idx>=0) usuarios[idx]=a; else usuarios.unshift(a);
+  });
+  DB.s('usuarios', usuarios);
+  DB.s('admins_criados', true);
+
+  err.classList.remove('show');
+
+  // Faz login automático como Admin TI após configurar
+  S.usuarios = usuarios;
+  S.user = admins[0];
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  initApp();
+  toast('success','✅ Sistema configurado! Bem-vindo, Administrador TI.');
+}
+
+const S = {
+  user: null,
+  editLeitoId: null,
+  atribId: null,
+  activeNav: '',
+
+  config: DB.l('config', {
+    /* ── Identidade ── */
+    nomeHospital: 'HOSPITAL DA CIDADE',
+    subTitulo: 'Sistema Integrado de Gestão Hospitalar',
+    cnpj: '',
+    telefone: '',
+    endereco: '',
+    cidade: '',
+    email: '',
+    /* ── Cores tema ── */
+    corPrimaria: '#1a56db',
+    corSecundaria: '#0694a2',
+    /* ── Transporte ── */
+    tempoMaxTransporte: 30,
+    equipamentos: ['Cadeira de Rodas','Maca','Maca + Monitor Cardíaco','Suporte de O₂','Incubadora'],
+    locaisOrigem: ['Emergência','A-101','A-102','A-103','A-104','A-105','A-106','UTI-01','UTI-02','UTI-03','PED-01','PED-02','Admissão','Raio-X'],
+    locaisDestino: ['Tomografia','Raio-X','Centro Cirúrgico','UTI-01','UTI-02','UTI-03','Hemodinâmica','Fisioterapia','Alta (Portaria)','Endoscopia','Maternidade','Emergência'],
+    /* ── Leitos / Alas ── */
+    alas: ['Ala A — Internação Clínica','Ala B — UTI','Ala C — Pediátrica'],
+    /* ── Hotelaria ── */
+    tiposHotelaria: ['Higienização de Leito','Limpeza de Enfermaria','Solicitação de Mobiliário','Troca de Roupa de Cama','Limpeza Terminal (Alta/Óbito)'],
+    /* ── Notificações ── */
+    notifSonora: true,
+    autoRefresh: 30,
+  }),
+
+  usuarios: DB.l('usuarios', [
+    {id:'u1',nome:'Administrador TI',cpf:'000.000.000-01',login:'admin.ti',senha:'Admin@123',setor:'ti',role:'admin',coren:'',tel:''},
+    {id:'u2',nome:'Admin Transporte',cpf:'000.000.000-02',login:'admin.transp',senha:'Admin@123',setor:'transp_op',role:'admin',coren:'',tel:''},
+    {id:'u3',nome:'Enf. Ana Souza',cpf:'123.456.789-00',login:'123.456.789-00',senha:'Enf@123',setor:'enfermagem',role:'user',coren:'COREN-SP 123456',tel:''},
+    {id:'u4',nome:'Enf. Carlos Lima',cpf:'987.654.321-00',login:'enf2',senha:'Enf@123',setor:'enfermagem',role:'user',coren:'COREN-SP 654321',tel:''},
+    {id:'u5',nome:'Hotelaria Geral',cpf:'',login:'hotelaria',senha:'Hot@123',setor:'hotelaria',role:'user',coren:'',tel:''},
+    {id:'u6',nome:'Portaria Principal',cpf:'',login:'portaria',senha:'Port@123',setor:'portaria',role:'user',coren:'',tel:''},
+    {id:'u7',nome:'NIR Gestão',cpf:'',login:'nir',senha:'Nir@123',setor:'nir',role:'user',coren:'',tel:''},
+    {id:'u8',nome:'Central de Transporte',cpf:'',login:'transp.op',senha:'Transp@123',setor:'transp_op',role:'user',coren:'',tel:''},
+    {id:'u9',nome:'Carlos Aux.',cpf:'',login:'aux1',senha:'Aux@123',setor:'transp_aux',role:'user',coren:'',tel:''},
+    {id:'u10',nome:'Marcos Aux.',cpf:'',login:'aux2',senha:'Aux@123',setor:'transp_aux',role:'user',coren:'',tel:''},
+  ]),
+
+  leitos: DB.l('leitos', [
+    {id:'A101',num:'A-101',ala:'Ala A — Internação Clínica',status:'busy',paciente:'M. Ferreira',obs:'Pós-op abdominal',cleanTs:null},
+    {id:'A102',num:'A-102',ala:'Ala A — Internação Clínica',status:'free',paciente:'',obs:'',cleanTs:null},
+    {id:'A103',num:'A-103',ala:'Ala A — Internação Clínica',status:'cleaning',paciente:'',obs:'Alta 08h14',cleanTs:Date.now()-600000},
+    {id:'A104',num:'A-104',ala:'Ala A — Internação Clínica',status:'busy',paciente:'J. Santos',obs:'Aguarda CC',cleanTs:null},
+    {id:'A105',num:'A-105',ala:'Ala A — Internação Clínica',status:'free',paciente:'',obs:'',cleanTs:null},
+    {id:'A106',num:'A-106',ala:'Ala A — Internação Clínica',status:'reserved',paciente:'P. Lima',obs:'Admissão 14h',cleanTs:null},
+    {id:'UTI01',num:'UTI-01',ala:'Ala B — UTI',status:'busy',paciente:'R. Gomes',obs:'Ventilação mecânica',cleanTs:null},
+    {id:'UTI02',num:'UTI-02',ala:'Ala B — UTI',status:'busy',paciente:'C. Alves',obs:'Sepse severa',cleanTs:null},
+    {id:'UTI03',num:'UTI-03',ala:'Ala B — UTI',status:'cleaning',paciente:'',obs:'',cleanTs:Date.now()-300000},
+    {id:'UTI04',num:'UTI-04',ala:'Ala B — UTI',status:'free',paciente:'',obs:'',cleanTs:null},
+    {id:'PED01',num:'PED-01',ala:'Ala C — Pediátrica',status:'busy',paciente:'A. Costa',obs:'Pneumonia',cleanTs:null},
+    {id:'PED02',num:'PED-02',ala:'Ala C — Pediátrica',status:'free',paciente:'',obs:'',cleanTs:null},
+    {id:'PED03',num:'PED-03',ala:'Ala C — Pediátrica',status:'blocked',paciente:'',obs:'Manutenção elétrica',cleanTs:null},
+  ]),
+
+  transportes: DB.l('transportes', [
+    {id:'t1',paciente:'M. Oliveira',origem:'Emergência',destino:'Tomografia',prio:'critical',status:'pending',equip:'Maca + Monitor Cardíaco',obs:'Suspeita AVC',solicitante:'Enf. Ana Souza',setor:'enfermagem',
+     ts:Date.now()-120000,auxId:null,elapsed:0,tsConc:null,
+     /* Tempos operacionais */
+     tsSolicitacao:Date.now()-120000,   // Hora da solicitação
+     tsAuxSaiu:null,                    // Auxiliar saiu para o setor
+     tsAuxChegouSetor:null,             // Auxiliar chegou no setor solicitante
+     tsInicioTransporte:null,           // Início do transporte (paciente embarcou)
+     tsFimTransporte:null,              // Fim do transporte (paciente entregue)
+     incidente:false,                   // Teve incidente?
+     descIncidente:'',                  // Descrição do incidente
+     noprazo:null,                      // Finalizado no prazo <=35min?
+    },
+    {id:'t2',paciente:'J. Santos',origem:'A-104',destino:'Centro Cirúrgico',prio:'high',status:'active',equip:'Maca',obs:'Cirurgia emergência',solicitante:'Enf. Ana Souza',setor:'enfermagem',
+     ts:Date.now()-720000,auxId:'u9',elapsed:720,tsConc:null,
+     tsSolicitacao:Date.now()-720000,
+     tsAuxSaiu:Date.now()-600000,
+     tsAuxChegouSetor:Date.now()-540000,
+     tsInicioTransporte:Date.now()-480000,
+     tsFimTransporte:null,
+     incidente:false,descIncidente:'',noprazo:null,
+    },
+  ]),
+
+  hotelaria: DB.l('hotelaria', [
+    {id:'h1',tipo:'higienizacao_leito',tipoLabel:'Higienização de Leito',leito:'A-103',prio:'high',obs:'Alta médica',status:'inprogress',solicitante:'Enf. Ana Souza',ts:Date.now()-600000,tsConc:null},
+    {id:'h2',tipo:'limpeza_enfermaria',tipoLabel:'Limpeza de Enfermaria',leito:'PED-01',prio:'normal',obs:'',status:'pending',solicitante:'Enf. Carlos Lima',ts:Date.now()-300000,tsConc:null},
+  ]),
+
+  pacientes: DB.l('pacientes', [
+    {id:'p1',nome:'M. Ferreira',leito:'A-101',status:'internado',entrada:'2025-05-10',acomp:'Paulo Ferreira',obs:'Visita autorizada'},
+    {id:'p2',nome:'J. Santos',leito:'A-104',status:'internado',entrada:'2025-05-09',acomp:'',obs:''},
+    {id:'p3',nome:'R. Gomes',leito:'UTI-01',status:'internado',entrada:'2025-05-08',acomp:'',obs:'Sem visitas — UTI'},
+    {id:'p4',nome:'A. Costa',leito:'PED-01',status:'internado',entrada:'2025-05-11',acomp:'Maria Costa (mãe)',obs:''},
+  ]),
+
+  visitas: DB.l('visitas', [
+    {id:'v1',nome:'Paulo Ferreira',doc:'123.456.789-01',pacienteId:'p1',tipo:'acompanhante',entrada:Date.now()-3600000,saida:null,obs:'Autorizado'},
+  ]),
+
+  notificacoes: DB.l('notifs', []),
+};
+
+function saveAll(){
+  DB.s('usuarios',S.usuarios); DB.s('leitos',S.leitos);
+  DB.s('transportes',S.transportes); DB.s('hotelaria',S.hotelaria);
+  DB.s('pacientes',S.pacientes); DB.s('visitas',S.visitas);
+  DB.s('notifs',S.notificacoes); DB.s('config',S.config);
+}
+
+function applyConfig(){
+  const c=S.config;
+  // Nome do hospital em todos os lugares
+  document.querySelectorAll('.hospital-nome').forEach(el=>el.textContent=c.nomeHospital);
+  document.querySelectorAll('.hospital-sub').forEach(el=>el.textContent=c.subTitulo);
+  document.title=c.nomeHospital+' — Sistema Integrado';
+  // Cores
+  document.documentElement.style.setProperty('--blue', c.corPrimaria);
+  document.documentElement.style.setProperty('--teal', c.corSecundaria);
+  // Gradiente login icon e topbar
+  const loginIcon=document.querySelector('.login-logo-icon');
+  if(loginIcon) loginIcon.style.background=`linear-gradient(135deg,${c.corPrimaria},${c.corSecundaria})`;
+  const topLogo=document.getElementById('topbarLogo');
+  if(topLogo) topLogo.style.background=`linear-gradient(135deg,${c.corPrimaria},${c.corSecundaria})`;
+
+  // Iniciais dinâmicas baseadas no nome do hospital
+  const initials = c.nomeHospital.split(' ').filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('') || c.nomeHospital.slice(0,2).toUpperCase();
+  const topInit = document.getElementById('topbarInitials');
+  if(topInit) topInit.textContent = initials;
+
+  // Logo customizado
+  if(c.logoBase64){
+    // Top bar
+    const imgTop=document.getElementById('logoImgTop');
+    const initEl=document.getElementById('topbarInitials');
+    if(imgTop){ imgTop.src=c.logoBase64; imgTop.style.display='block'; }
+    if(initEl) initEl.style.display='none';
+    if(topLogo) topLogo.style.background='transparent';
+    // Login
+    const imgLogin=document.getElementById('logoImgLogin');
+    const icoLogin=document.getElementById('loginLogoIco');
+    if(imgLogin){ imgLogin.src=c.logoBase64; imgLogin.style.display='block'; }
+    if(icoLogin) icoLogin.style.display='none';
+    if(loginIcon) loginIcon.style.background='transparent';
+  } else {
+    const imgTop=document.getElementById('logoImgTop');
+    const initEl=document.getElementById('topbarInitials');
+    if(imgTop) imgTop.style.display='none';
+    if(initEl) initEl.style.display='';
+    const imgLogin=document.getElementById('logoImgLogin');
+    const icoLogin=document.getElementById('loginLogoIco');
+    if(imgLogin) imgLogin.style.display='none';
+    if(icoLogin) icoLogin.style.display='';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CONSTANTES
+══════════════════════════════════════════════ */
+const SETORES = {
+  ti:         {label:'TI / Administração',   color:'#1d4ed8',bg:'#eff6ff'},
+  transp_op:  {label:'Central de Transporte',color:'#6d28d9',bg:'#f5f3ff'},
+  transp_aux: {label:'Aux. de Transporte',   color:'#6d28d9',bg:'#f5f3ff'},
+  enfermagem: {label:'Enfermagem',            color:'#065f46',bg:'#ecfdf5'},
+  hotelaria:  {label:'Hotelaria',             color:'#92400e',bg:'#fffbeb'},
+  portaria:   {label:'Portaria',              color:'#9f1239',bg:'#fff1f2'},
+  nir:        {label:'NIR',                   color:'#14532d',bg:'#f0fdf4'},
+};
+const _LO_STATIC = ['Emergência','A-101','A-102','A-103','A-104','A-105','A-106','UTI-01','UTI-02','UTI-03','PED-01','PED-02','Admissão','Raio-X'];
+const _LD_STATIC = ['Tomografia','Raio-X','Centro Cirúrgico','UTI-01','UTI-02','UTI-03','Hemodinâmica','Fisioterapia','Alta (Portaria)','Endoscopia','Maternidade','Emergência'];
+const STATUS_LEITO   = {free:'Livre',busy:'Ocupado',cleaning:'Higienização',reserved:'Reservado',blocked:'Bloqueado'};
+const ICON_LEITO     = {free:'fa-check-circle',busy:'fa-user-injured',cleaning:'fa-broom',reserved:'fa-bookmark',blocked:'fa-ban'};
+const BADGE_LEITO    = {free:'b-free',busy:'b-busy',cleaning:'b-clean',reserved:'b-reserved',blocked:'b-blocked'};
+const TIPO_HOTEL     = {higienizacao_leito:'Higienização de Leito',limpeza_enfermaria:'Limpeza de Enfermaria',mobiliario:'Mobiliário',roupa_cama:'Roupa de Cama',terminal:'Limpeza Terminal'};
+// Dynamic from config:
+const LOCAIS_ORIGEM = () => S.config.locaisOrigem;
+const LOCAIS_DESTINO = () => S.config.locaisDestino;
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+const uid = () => 'x'+Date.now()+Math.random().toString(36).slice(2,6);
+const gv  = id => { const e=document.getElementById(id); return e?e.value.trim():''; };
+const dt  = ts => ts ? new Date(ts).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+const dtD = ts => ts ? new Date(ts).toLocaleDateString('pt-BR') : '—';
+
+function elapsed(ts){
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60) return s+'s';
+  const m=Math.floor(s/60);
+  if(m<60) return m+'min';
+  return Math.floor(m/60)+'h '+m%60+'min';
+}
+function prioLbl(p){ return {critical:'Crítica',high:'Alta',normal:'Normal'}[p]||p; }
+function prioBadge(p){ return {critical:'b-crit',high:'b-high',normal:'b-norm'}[p]||'b-norm'; }
+function stLbl(s){ return {pending:'Aguardando',active:'Em Curso',done:'Concluído',inprogress:'Em Andamento',cancelled:'Cancelado'}[s]||s; }
+function stBadge(s){ return {pending:'b-pend',active:'b-prog',done:'b-done',inprogress:'b-prog',cancelled:'b-blocked'}[s]||''; }
+
+function toast(type, msg){
+  const icons={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
+  const d=document.createElement('div');
+  d.className=`toast ${type}`;
+  d.innerHTML=`<i class="fas ${icons[type]||'fa-bell'}"></i><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(d);
+  setTimeout(()=>d.remove(),4200);
+}
+function openModal(id){ document.getElementById(id)?.classList.add('open'); }
+function closeModal(id){ document.getElementById(id)?.classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) closeModal(el.id); }));
+
+function addNotif(title, msg, setor){
+  S.notificacoes.unshift({id:uid(),title,msg,setor,ts:Date.now(),lido:false});
+  if(S.notificacoes.length>60) S.notificacoes=S.notificacoes.slice(0,60);
+  saveAll(); updNotifBadge();
+}
+function updNotifBadge(){
+  const s=S.user?.setor;
+  const n=S.notificacoes.filter(n=>!n.lido&&(n.setor===s||n.setor==='all')).length;
+  document.getElementById('notifDot').style.display=n>0?'block':'none';
+}
+function limparNotif(){ S.notificacoes=[]; saveAll(); document.getElementById('notifBody').innerHTML='<div class="empty"><i class="fas fa-bell-slash"></i><p>Sem notificações</p></div>'; updNotifBadge(); }
+
+function maskCPF(el){ let v=el.value.replace(/\D/g,'').slice(0,11); v=v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3').replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4'); el.value=v; }
+
+/* ══════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════ */
+function setTab(t){
+  document.querySelectorAll('.login-tab').forEach((b,i)=>b.classList.toggle('active',(t==='login'&&i===0)||(t==='forgot'&&i===1)));
+  document.getElementById('fLogin').style.display=t==='login'?'':'none';
+  document.getElementById('fForgot').style.display=t==='forgot'?'':'none';
+}
+
+function mostrarAjuda(){ } // mantido por compatibilidade
+function preencherLogin(l,s){ document.getElementById('lUser').value=l; document.getElementById('lPass').value=s; }
+
+function doLogin(){
+  const login=document.getElementById('lUser').value.trim();
+  const senha=document.getElementById('lPass').value;
+  const err=document.getElementById('loginErr');
+  // Carrega sempre do localStorage para pegar admins criados
+  const usuarios=DB.l('usuarios',[]);
+  const u=usuarios.find(u=>(u.login===login||u.cpf===login)&&u.senha===senha);
+  if(!u){
+    err.textContent='Login ou senha incorretos. Verifique seus dados.';
+    err.classList.add('show'); return;
+  }
+  err.classList.remove('show');
+  S.usuarios=usuarios;
+  S.user=u;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  initApp();
+}
+
+function doLogout(){
+  S.user=null;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('lUser').value='';
+  document.getElementById('lPass').value='';
+}
+
+/* ══════════════════════════════════════════════
+   INIT APP
+══════════════════════════════════════════════ */
+function initApp(){
+  const u=S.user, si=SETORES[u.setor]||{};
+  const badge=document.getElementById('sectorBadge');
+  badge.textContent=si.label||u.setor;
+  badge.style.background=si.bg; badge.style.color=si.color;
+  const av=document.getElementById('userAv');
+  av.textContent=u.nome.charAt(0).toUpperCase();
+  av.style.background=si.color||'var(--blue)';
+  document.getElementById('userName').textContent=u.nome.split(' ')[0];
+  applyConfig();
+  buildSidebar();
+  go(defaultNav());
+  updNotifBadge();
+  // populate selects
+  fillSelect('t-orig', LOCAIS_ORIGEM());
+  fillSelect('t-dest', LOCAIS_DESTINO());
+  fillSelect('h-leito', S.leitos.map(l=>l.num));
+}
+
+function defaultNav(){
+  const s=S.user.setor;
+  if(s==='ti') return 'adm-dash';
+  if(s==='transp_op') return 'tr-painel';
+  if(s==='transp_aux') return 'aux-tarefas';
+  if(s==='enfermagem') return 'enf-painel';
+  if(s==='hotelaria') return 'hotel-solics';
+  if(s==='portaria') return 'port-painel';
+  if(s==='nir') return 'nir-leitos';
+  return 'adm-dash';
+}
+
+function fillSelect(id, opts){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const cur=el.value;
+  el.innerHTML='<option value="">Selecionar...</option>'+opts.map(o=>`<option value="${o}">${o}</option>`).join('');
+  if(cur) el.value=cur;
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════ */
+function buildSidebar(){
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML='';
+  getNavs().forEach(item=>{
+    if(item.sep){ const d=document.createElement('div'); d.className='nav-sec'; d.textContent=item.sep; sb.appendChild(d); return; }
+    const b=document.createElement('button');
+    b.className='nav-item'+(S.activeNav===item.id?' active':'');
+    b.id='nav-'+item.id;
+    const cnt=navCount(item.id);
+    b.innerHTML=`<i class="fas ${item.icon}"></i><span class="nav-label">${item.label}</span>${cnt?`<span class="nav-badge ${item.bc||''}">${cnt}</span>`:''}`;
+    b.onclick=()=>go(item.id);
+    sb.appendChild(b);
+  });
+}
+
+function navCount(id){
+  if(id==='tr-pendentes') return S.transportes.filter(t=>t.status==='pending').length||'';
+  if(id==='hotel-solics') return S.hotelaria.filter(h=>h.status==='pending').length||'';
+  if(id==='enf-st-transp') return S.transportes.filter(t=>t.status==='active').length||'';
+  if(id==='nir-higieniz') return S.leitos.filter(l=>l.status==='cleaning').length||'';
+  if(id==='port-visitas') return S.visitas.filter(v=>!v.saida).length||'';
+  return '';
+}
+
+function getNavs(){
+  const s=S.user.setor, r=S.user.role;
+  if(s==='ti') return [
+    {sep:'Administração'},
+    {id:'adm-dash',icon:'fa-gauge',label:'Dashboard'},
+    {id:'adm-usuarios',icon:'fa-users',label:'Usuários'},
+    {id:'adm-cadastro',icon:'fa-user-plus',label:'Cadastrar Usuário'},
+    {sep:'Monitor Global'},
+    {id:'adm-leitos',icon:'fa-bed',label:'Mapa de Leitos'},
+    {id:'adm-transportes',icon:'fa-ambulance',label:'Transportes'},
+    {id:'adm-hotelaria',icon:'fa-broom',label:'Hotelaria'},
+    {id:'adm-portaria',icon:'fa-door-open',label:'Portaria'},
+    {id:'tr-indicadores',icon:'fa-chart-line',label:'KPIs / Indicadores'},
+    {sep:'Sistema'},
+    {id:'cfg-hospital',icon:'fa-hospital-alt',label:'Configurações'},
+    {id:'manutencao-ti',icon:'fa-screwdriver-wrench',label:'Manutenção'},
+  ];
+  if(s==='transp_op') return [
+    {sep:'Central de Transporte'},
+    {id:'tr-painel',icon:'fa-gauge',label:'Painel Geral'},
+    {id:'tr-pendentes',icon:'fa-inbox',label:'Solicitações',bc:''},
+    {id:'tr-em-curso',icon:'fa-route',label:'Em Curso'},
+    {id:'tr-historico',icon:'fa-history',label:'Histórico'},
+    {sep:'Indicadores'},
+    {id:'tr-indicadores',icon:'fa-chart-line',label:'KPIs / Indicadores'},
+    {sep:'Equipe'},
+    {id:'tr-auxiliares',icon:'fa-person-walking',label:'Auxiliares'},
+    {id:'adm-cadastro',icon:'fa-user-plus',label:'Cadastrar'},
+    {id:'ponto-dashboard',icon:'fa-clock',label:'Ponto Eletrônico'},
+    {sep:'Sistema'},
+    {id:'cfg-transporte',icon:'fa-sliders',label:'Configurações'},
+    {id:'manutencao-transp',icon:'fa-screwdriver-wrench',label:'Manutenção'},
+  ];
+  if(s==='transp_aux') return [
+    {id:'aux-tarefas',icon:'fa-list-check',label:'Minhas Tarefas'},
+    {id:'aux-historico',icon:'fa-history',label:'Meu Histórico'},
+    {id:'ponto-registrar',icon:'fa-clock',label:'Meu Ponto'},
+  ];
+  if(s==='enfermagem') return [
+    {sep:'Meu Painel'},
+    {id:'enf-painel',icon:'fa-gauge',label:'Painel'},
+    {sep:'Solicitações'},
+    {id:'enf-sol-transp',icon:'fa-ambulance',label:'Solicitar Transporte'},
+    {id:'enf-sol-hotel',icon:'fa-broom',label:'Solicitar Hotelaria'},
+    {sep:'Acompanhar'},
+    {id:'enf-st-transp',icon:'fa-route',label:'Meus Transportes'},
+    {id:'enf-st-hotel',icon:'fa-soap',label:'Minha Hotelaria'},
+  ];
+  if(s==='hotelaria') return [
+    {id:'hotel-solics',icon:'fa-inbox',label:'Solicitações',bc:'o'},
+    {id:'hotel-andamento',icon:'fa-spinner',label:'Em Andamento'},
+    {id:'hotel-concluidas',icon:'fa-check-circle',label:'Concluídas'},
+    {id:'hotel-leitos',icon:'fa-bed',label:'Status Leitos'},
+  ];
+  if(s==='portaria') return [
+    {id:'port-painel',icon:'fa-gauge',label:'Painel de Acesso'},
+    {id:'port-internados',icon:'fa-bed',label:'Pacientes Internados'},
+    {id:'port-visitas',icon:'fa-people-group',label:'Visitas / Acomp.'},
+    {id:'port-registrar',icon:'fa-person-walking-arrow-right',label:'Registrar Entrada'},
+    {id:'port-altas',icon:'fa-right-from-bracket',label:'Altas / Saídas'},
+  ];
+  if(s==='nir') return [
+    {id:'nir-leitos',icon:'fa-bed',label:'Gestão de Leitos'},
+    {id:'nir-higieniz',icon:'fa-broom',label:'Higienizações',bc:'o'},
+    {id:'nir-internar',icon:'fa-user-plus',label:'Internar Paciente'},
+    {id:'nir-internacoes',icon:'fa-clipboard-list',label:'Internações Ativas'},
+    {id:'nir-altas',icon:'fa-right-from-bracket',label:'Altas Pendentes'},
+  ];
+  return [];
+}
+
+function go(id){
+  S.activeNav=id;
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-'+id)?.classList.add('active');
+  render(id);
+}
+
+/* ══════════════════════════════════════════════
+   ROUTER
+══════════════════════════════════════════════ */
+function render(id){
+  const c=document.getElementById('content');
+  c.innerHTML='';
+  switch(id){
+    case 'adm-dash':       admDash(c); break;
+    case 'adm-usuarios':   admUsuarios(c); break;
+    case 'adm-cadastro':   admCadastro(c); break;
+    case 'adm-leitos':     admLeitos(c); break;
+    case 'adm-transportes':trListar(c,'all'); break;
+    case 'adm-hotelaria':  hotelListar(c,'all'); break;
+    case 'adm-portaria':   portPainel(c); break;
+    case 'cfg-hospital':   cfgHospital(c); break;
+    case 'cfg-transporte': cfgTransporte(c); break;
+    case 'manutencao-ti':  manutencaoTI(c); break;
+    case 'manutencao-transp': manutencaoTransp(c); break;
+    case 'ponto-dashboard': pontoDashboard(c); break;
+    case 'ponto-registrar': pontoRegistrar(c); break;
+    case 'tr-painel':      trPainel(c); break;
+    case 'tr-pendentes':   trListar(c,'pending'); break;
+    case 'tr-em-curso':    trListar(c,'active'); break;
+    case 'tr-historico':   trListar(c,'done'); break;
+    case 'tr-indicadores': renderIndicadores(c); break;
+    case 'tr-auxiliares':  trAuxiliares(c); break;
+    case 'aux-tarefas':    auxTarefas(c); break;
+    case 'aux-historico':  auxHistorico(c); break;
+    case 'enf-painel':     enfPainel(c); break;
+    case 'enf-sol-transp': enfSolTransp(c); break;
+    case 'enf-sol-hotel':  enfSolHotel(c); break;
+    case 'enf-st-transp':  trListar(c,'mine'); break;
+    case 'enf-st-hotel':   hotelListar(c,'mine'); break;
+    case 'hotel-solics':   hotelListar(c,'pending'); break;
+    case 'hotel-andamento':hotelListar(c,'inprogress'); break;
+    case 'hotel-concluidas':hotelListar(c,'done'); break;
+    case 'hotel-leitos':   hotelLeitos(c); break;
+    case 'port-painel':    portPainel(c); break;
+    case 'port-internados':portInternados(c); break;
+    case 'port-visitas':   portVisitas(c); break;
+    case 'port-registrar': portRegistrar(c); break;
+    case 'port-altas':     portAltas(c); break;
+    case 'nir-leitos':     nirLeitos(c); break;
+    case 'nir-higieniz':   nirHigieniz(c); break;
+    case 'nir-internar':   nirInternar(c); break;
+    case 'nir-internacoes':nirInternacoes(c); break;
+    case 'nir-altas':      nirAltas(c); break;
+    default: c.innerHTML='<div class="empty"><i class="fas fa-tools"></i><p>Módulo em desenvolvimento</p></div>';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   NOTIFICAÇÕES
+══════════════════════════════════════════════ */
+function openNotif(){
+  const s=S.user.setor;
+  const list=S.notificacoes.filter(n=>n.setor===s||n.setor==='all');
+  const el=document.getElementById('notifBody');
+  if(!list.length){ el.innerHTML='<div class="empty"><i class="fas fa-bell-slash"></i><p>Sem notificações</p></div>'; }
+  else el.innerHTML=list.map(n=>`
+    <div style="padding:10px;border-bottom:1px solid var(--border);${!n.lido?'background:var(--blue-lt);':''}border-radius:6px;margin-bottom:4px">
+      <div style="font-weight:700;font-size:12px;margin-bottom:2px">${n.title}</div>
+      <div style="font-size:11px;color:var(--muted)">${n.msg}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">${dt(n.ts)}</div>
+    </div>`).join('');
+  list.forEach(n=>n.lido=true);
+  saveAll(); updNotifBadge();
+  openModal('mNotif');
+}
+
+/* ══════════════════════════════════════════════
+   ADM / TI
+══════════════════════════════════════════════ */
+function admDash(c){
+  const free=S.leitos.filter(l=>l.status==='free').length;
+  const busy=S.leitos.filter(l=>l.status==='busy').length;
+  const clean=S.leitos.filter(l=>l.status==='cleaning').length;
+  const pT=S.transportes.filter(t=>t.status==='pending').length;
+  const pH=S.hotelaria.filter(h=>h.status==='pending').length;
+  c.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Dashboard Administrativo</div><div class="page-subtitle">Visão geral em tempo real</div></div></div>
+  <div class="kpi-grid">
+    ${kpi('fa-check-circle','var(--green-lt)','var(--green)',free,'Leitos Livres')}
+    ${kpi('fa-user-injured','var(--red-lt)','var(--red)',busy,'Leitos Ocupados')}
+    ${kpi('fa-broom','var(--orange-lt)','var(--orange)',clean,'Em Higienização')}
+    ${kpi('fa-ambulance','var(--purple-lt)','var(--purple)',pT,'Transportes Pendentes')}
+    ${kpi('fa-soap','var(--orange-lt)','var(--orange)',pH,'Hotelaria Pendente')}
+    ${kpi('fa-users','var(--blue-lt)','var(--blue)',S.usuarios.length,'Usuários')}
+  </div>
+  <div class="card"><div class="card-title"><i class="fas fa-bed"></i>Mapa de Leitos — Visão Geral</div><div class="bed-grid-v" id="adm-bg"></div></div>`;
+  bedGrid('adm-bg', true);
+}
+
+function admUsuarios(c){
+  const excluidos=DB.l('excluidos',[]);
+  const seteDias=7*24*60*60*1000;
+  const bloqueados=excluidos.filter(e=>(Date.now()-e.tsExclusao)<seteDias);
+  c.innerHTML=`
+  <div class="page-header">
+    <div><div class="page-title">Usuários Cadastrados</div><div class="page-subtitle">${S.usuarios.length} usuário(s) ativo(s)</div></div>
+    <button class="btn btn-primary" onclick="go('adm-cadastro')"><i class="fas fa-user-plus"></i> Novo</button>
+  </div>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Nome</th><th>CPF</th><th>COREN</th><th>E-mail</th><th>Setor</th><th>Login</th><th>Perfil</th><th></th></tr></thead>
+    <tbody>${S.usuarios.map(u=>`
+      <tr>
+        <td><strong>${u.nome}</strong></td>
+        <td style="font-family:'Courier New',monospace;font-size:11px">${u.cpf||'—'}</td>
+        <td style="font-size:11px">${u.coren||'—'}</td>
+        <td style="font-size:11px">${u.email||'—'}</td>
+        <td><span class="badge" style="background:${SETORES[u.setor]?.bg||'#f1f5f9'};color:${SETORES[u.setor]?.color||'#374151'}">${SETORES[u.setor]?.label||u.setor}</span></td>
+        <td><code style="font-size:10px;background:var(--bg);padding:2px 6px;border-radius:4px">${u.login}</code></td>
+        <td>${u.role==='admin'?'<span class="badge b-crit">Admin</span>':'<span class="badge b-norm">Usuário</span>'}</td>
+        <td><button class="btn btn-xs btn-danger" onclick="excluirUser('${u.id}')"><i class="fas fa-trash"></i></button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div></div>
+  ${bloqueados.length?`
+  <div class="card" style="border:1px solid #fcd34d">
+    <div class="card-title" style="color:var(--orange)"><i class="fas fa-clock" style="color:var(--orange)"></i> CPF/COREN Bloqueados — Aguardando 7 dias</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>COREN</th><th>Excluído em</th><th>Dias Restantes</th><th>Por</th></tr></thead>
+      <tbody>${bloqueados.map(e=>{
+        const diasR=Math.ceil((seteDias-(Date.now()-e.tsExclusao))/(24*60*60*1000));
+        return `<tr>
+          <td>${e.nome}</td>
+          <td style="font-size:11px;font-family:'Courier New',monospace">${e.cpf||'—'}</td>
+          <td style="font-size:11px">${e.coren||'—'}</td>
+          <td style="font-size:11px">${dt(e.tsExclusao)}</td>
+          <td><span class="badge b-pend">⏳ ${diasR} dia(s)</span></td>
+          <td style="font-size:11px">${e.excluidoPor||'—'}</td>
+        </tr>`;}).join('')}
+      </tbody>
+    </table></div>
+  </div>`:''}`;
+}
+
+function excluirUser(id){
+  const u=S.usuarios.find(x=>x.id===id);
+  if(!u||!confirm(`Excluir o usuário "${u.nome}"?\n\nApós a exclusão, o CPF/COREN ficará bloqueado por 7 dias para novo cadastro.`)) return;
+  const excluidos=DB.l('excluidos',[]);
+  excluidos.push({id:u.id,nome:u.nome,cpf:u.cpf,coren:u.coren,setor:u.setor,tsExclusao:Date.now(),excluidoPor:S.user.nome});
+  DB.s('excluidos',excluidos);
+  S.usuarios=S.usuarios.filter(x=>x.id!==id);
+  saveAll(); toast('success','Usuário removido. CPF/COREN bloqueado por 7 dias.'); go('adm-usuarios');
+}
+
+function admCadastro(c){
+  const isTranspOp=S.user.setor==='transp_op';
+  c.innerHTML=`
+  <div class="page-header"><div><div class="page-title">Cadastrar Usuário</div><div class="page-subtitle">Preencha todos os dados obrigatórios</div></div></div>
+  <div class="card" style="max-width:540px">
+    <div class="form-row"><label class="form-label">Nome Completo *</label><input class="form-input" id="ci-nome" placeholder="Nome completo"></div>
+    <div class="form-row"><label class="form-label">CPF *</label><input class="form-input" id="ci-cpf" placeholder="000.000.000-00" oninput="maskCPF(this)"></div>
+    <div class="form-row" id="ci-coren-r" style="display:none"><label class="form-label">COREN *</label><input class="form-input" id="ci-coren" placeholder="COREN-SP 000000"></div>
+    <div class="form-row"><label class="form-label">Setor *</label>
+      <select class="form-select" id="ci-setor" onchange="onCiSetor()">
+        <option value="">Selecionar...</option>
+        <option value="enfermagem">Enfermagem</option>
+        <option value="hotelaria">Hotelaria</option>
+        <option value="portaria">Portaria</option>
+        <option value="nir">NIR</option>
+        <option value="transp_op">Central de Transporte (Operador)</option>
+        <option value="transp_aux">Auxiliar de Transporte</option>
+        <option value="ti">TI / Administração</option>
+      </select>
+    </div>
+    <div class="form-row"><label class="form-label">E-mail *</label><input class="form-input" id="ci-email" type="email" placeholder="email@hospital.com.br"></div>
+    <div class="form-row"><label class="form-label">Telefone</label><input class="form-input" id="ci-tel" placeholder="(00) 00000-0000"></div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0"><label class="form-label">Login *</label><input class="form-input" id="ci-login" placeholder="login único"></div>
+      <div class="form-row" style="margin:0"><label class="form-label">Senha *</label><input class="form-input" id="ci-senha" type="password" placeholder="Mín. 8 caracteres"></div>
+    </div>
+    <div style="background:var(--blue-lt);border-radius:8px;padding:10px;font-size:11px;color:var(--blue);margin-bottom:14px">
+      <i class="fas fa-info-circle"></i> <strong>Regras de cadastro:</strong><br>
+      • CPF e COREN devem ser únicos no sistema<br>
+      • Após exclusão, aguardar 7 dias para novo cadastro com o mesmo CPF/COREN<br>
+      • Senha mínima de 8 caracteres
+    </div>
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button class="btn btn-outline" onclick="go('adm-usuarios')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCadastroInline()"><i class="fas fa-save"></i> Cadastrar</button>
+    </div>
+  </div>`;
+}
+
+function onCiSetor(){ const v=gv('ci-setor'); const r=document.getElementById('ci-coren-r'); if(r) r.style.display=v==='enfermagem'?'':'none'; }
+
+function verificarDuplicidade(cpf, coren, excluirId){
+  // Verifica ativos
+  const ativo = S.usuarios.find(u=>u.id!==excluirId&&((cpf&&u.cpf===cpf)||(coren&&u.coren&&u.coren===coren)));
+  if(ativo) return {bloqueado:true, msg:`CPF ou COREN já cadastrado para: ${ativo.nome}`};
+  // Verifica excluídos nos últimos 7 dias
+  const excluidos = DB.l('excluidos',[]);
+  const seteDias = 7*24*60*60*1000;
+  const recente = excluidos.find(e=>{
+    const dentroDoTempo = (Date.now()-e.tsExclusao)<seteDias;
+    const mesmoCPF = cpf && e.cpf===cpf;
+    const mesmoCOREN = coren && e.coren && e.coren===coren;
+    return dentroDoTempo && (mesmoCPF||mesmoCOREN);
+  });
+  if(recente){
+    const diasRestantes = Math.ceil((seteDias-(Date.now()-recente.tsExclusao))/(24*60*60*1000));
+    return {bloqueado:true, msg:`Este CPF/COREN foi excluído recentemente. Aguarde ${diasRestantes} dia(s) para novo cadastro.`};
+  }
+  return {bloqueado:false};
+}
+
+function salvarCadastroInline(){
+  const nome=gv('ci-nome'),cpf=gv('ci-cpf'),coren=gv('ci-coren'),setor=gv('ci-setor'),login=gv('ci-login'),senha=gv('ci-senha'),tel=gv('ci-tel'),email=gv('ci-email');
+  if(!nome||!setor||!login||!senha){ toast('error','Preencha os campos obrigatórios'); return; }
+  if(senha.length<8){ toast('error','Senha mínima 8 caracteres'); return; }
+  if(setor==='enfermagem'&&!coren){ toast('error','COREN obrigatório para Enfermagem'); return; }
+  if(!cpf){ toast('error','CPF é obrigatório'); return; }
+  if(S.usuarios.find(u=>u.login===login)){ toast('error','Este login já está cadastrado'); return; }
+  // Verificar duplicidade CPF/COREN
+  const dup = verificarDuplicidade(cpf, coren, null);
+  if(dup.bloqueado){ toast('error', dup.msg); return; }
+  if(email && !email.includes('@')){ toast('error','E-mail inválido'); return; }
+  S.usuarios.push({id:uid(),nome,cpf,coren,setor,login,senha,role:'user',tel,email:email||''});
+  saveAll(); toast('success',`Usuário "${nome}" cadastrado!`); go('adm-usuarios');
+}
+
+function admLeitos(c){
+  c.innerHTML=`<div class="page-header"><div><div class="page-title">Mapa de Leitos</div><div class="page-subtitle">Clique para gerenciar</div></div></div>
+  <div class="card"><div class="bed-grid-v" id="adm-bl"></div></div>`;
+  bedGrid('adm-bl', true);
+}
+
+/* ══════════════════════════════════════════════
+   LEITOS HELPERS
+══════════════════════════════════════════════ */
+function bedGrid(containerId, clickable){
+  const g=document.getElementById(containerId);
+  if(!g) return;
+  const alas=[...new Set(S.leitos.map(l=>l.ala))];
+  let html='';
+  alas.forEach(ala=>{
+    html+=`<div class="ala-title">${ala}</div>`;
+    S.leitos.filter(l=>l.ala===ala).forEach(l=>{
+      const onclick=clickable?`onclick="openLeitoModal('${l.id}')"`:'' ;
+      html+=`<div class="bed-v ${l.status}" ${onclick}>
+        <i class="fas ${ICON_LEITO[l.status]||'fa-bed'}"></i>
+        <div class="bv-num">${l.num}</div>
+        <div class="bv-st">${STATUS_LEITO[l.status]||l.status}</div>
+        ${l.paciente?`<div class="bv-pat">${l.paciente}</div>`:''}
+      </div>`;
+    });
+  });
+  g.innerHTML=html;
+}
+
+function kpi(icon,bg,color,val,lbl){
+  return `<div class="kpi-card">
+    <div class="kpi-icon" style="background:${bg}"><i class="fas ${icon}" style="color:${color}"></i></div>
+    <div><div class="kpi-num" style="color:${color}">${val}</div><div class="kpi-lbl">${lbl}</div></div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   MODAL LEITO
+══════════════════════════════════════════════ */
+function openLeitoModal(id){
+  const l=S.leitos.find(x=>x.id===id);
+  if(!l) return;
+  S.editLeitoId=id;
+  document.getElementById('leitoNum').textContent=l.num;
+  document.getElementById('leitoInfo').innerHTML=`<span class="badge ${BADGE_LEITO[l.status]}">${STATUS_LEITO[l.status]}</span> — ${l.ala}`;
+  document.getElementById('l-status').value=l.status;
+  document.getElementById('l-pac').value=l.paciente||'';
+  document.getElementById('l-obs').value=l.obs||'';
+  openModal('mLeito');
+}
+
+function salvarLeito(){
+  const l=S.leitos.find(x=>x.id===S.editLeitoId);
+  if(!l) return;
+  const st=gv('l-status');
+  l.status=st;
+  l.paciente=(st==='busy'||st==='reserved')?gv('l-pac'):'';
+  l.obs=gv('l-obs');
+  if(st==='cleaning') l.cleanTs=Date.now(); else l.cleanTs=null;
+  saveAll();
+  if(st==='free') addNotif('Leito Disponível',`Leito ${l.num} liberado pelo NIR`,'enfermagem');
+  if(st==='blocked') addNotif('Leito Bloqueado',`Leito ${l.num} foi bloqueado`,'all');
+  if(st==='cleaning') addNotif('Higienização Necessária',`Leito ${l.num} aguarda limpeza`,'hotelaria');
+  toast('success',`Leito ${l.num} atualizado!`);
+  closeModal('mLeito');
+  go(S.activeNav);
+}
+
+/* ══════════════════════════════════════════════
+   MODAL CADASTRO (modal global)
+══════════════════════════════════════════════ */
+function onCadSetorChange(){ const v=document.getElementById('c-setor').value; document.getElementById('c-coren-row').style.display=v==='enfermagem'?'':'none'; }
+
+function salvarCadastro(){
+  const nome=gv('c-nome'),cpf=gv('c-cpf'),coren=gv('c-coren'),setor=gv('c-setor'),login=gv('c-login'),senha=gv('c-senha'),tel=gv('c-tel');
+  if(!nome||!setor||!login||!senha){ toast('error','Preencha os campos obrigatórios'); return; }
+  if(senha.length<8){ toast('error','Senha mínima 8 caracteres'); return; }
+  if(S.usuarios.find(u=>u.login===login)){ toast('error','Login já cadastrado'); return; }
+  S.usuarios.push({id:uid(),nome,cpf,coren,setor,login,senha,role:'user',tel});
+  saveAll(); toast('success',`Usuário "${nome}" cadastrado!`); closeModal('mCadastro');
+}
+
+/* ══════════════════════════════════════════════
+   TRANSPORTES
+══════════════════════════════════════════════ */
+function trPainel(c){
+  const pend=S.transportes.filter(t=>t.status==='pending');
+  const actv=S.transportes.filter(t=>t.status==='active');
+  const done=S.transportes.filter(t=>t.status==='done').length;
+  const auxs=S.usuarios.filter(u=>u.setor==='transp_aux');
+  const disponiveis=auxs.filter(a=>!S.transportes.find(t=>t.auxId===a.id&&t.status==='active'));
+
+  c.innerHTML=`
+  <div class="page-header">
+    <div><div class="page-title">Painel Central de Transporte</div>
+    <div class="page-subtitle">Despacho e gestão em tempo real — ${new Date().toLocaleString('pt-BR')}</div></div>
+    <button class="btn btn-primary" onclick="abrirMTransp()"><i class="fas fa-plus"></i> Nova Solicitação</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    ${kpi('fa-inbox','var(--orange-lt)','var(--orange)',pend.length,'Aguardando Despacho')}
+    ${kpi('fa-route','var(--blue-lt)','var(--blue)',actv.length,'Em Curso')}
+    ${kpi('fa-check','var(--green-lt)','var(--green)',done,'Concluídos Hoje')}
+    ${kpi('fa-person-walking','var(--purple-lt)','var(--purple)',disponiveis.length+'/'+auxs.length,'Auxiliares Livres')}
+  </div>
+
+  <!-- PAINEL DE DESPACHO -->
+  <div class="card" style="border:2px solid var(--orange-lt)">
+    <div class="card-title" style="color:var(--orange)">
+      <i class="fas fa-paper-plane" style="color:var(--orange)"></i>
+      Central de Despacho — Solicitações Aguardando
+      ${pend.length?`<span class="badge b-pend" style="margin-left:8px">${pend.length} pendente(s)</span>`:''}
+    </div>
+    ${pend.length===0?`<div class="empty" style="padding:24px"><i class="fas fa-check-circle"></i><p>Nenhuma solicitação pendente</p></div>`:`
+    <div style="display:flex;flex-direction:column;gap:10px" id="despacho-list"></div>`}
+  </div>
+
+  <!-- EM CURSO -->
+  <div class="card">
+    <div class="card-title" style="color:var(--blue)">
+      <i class="fas fa-route" style="color:var(--blue)"></i>
+      Transportes em Curso
+      ${actv.length?`<span class="badge b-prog" style="margin-left:8px">${actv.length} em rota</span>`:''}
+    </div>
+    <div id="curso-list"></div>
+  </div>
+
+  <!-- AUXILIARES -->
+  <div class="card">
+    <div class="card-title" style="color:var(--purple)">
+      <i class="fas fa-person-walking" style="color:var(--purple)"></i>
+      Equipe de Auxiliares
+    </div>
+    <div id="aux-painel-list"></div>
+  </div>`;
+
+  // Renderiza despacho
+  const despachoEl = document.getElementById('despacho-list');
+  if(despachoEl){
+    pend.sort((a,b)=>({critical:0,high:1,normal:2}[a.prio]||2)-({critical:0,high:1,normal:2}[b.prio]||2)||a.ts-b.ts);
+    despachoEl.innerHTML = pend.map(t=>{
+      const tempoEsp = Math.floor((Date.now()-t.ts)/60000);
+      const alerta = tempoEsp>=15;
+      return `
+      <div class="req-card ${t.prio}" style="${alerta?'border:2px solid var(--red)':''}">
+        <div class="req-head">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="req-ttl"><i class="fas fa-user" style="font-size:10px;color:var(--muted)"></i> ${t.paciente}</div>
+            ${alerta?`<span class="badge b-busy" style="animation:blink 1s step-end infinite">⚠️ ${tempoEsp}min esperando</span>`:`<span style="font-size:11px;color:var(--muted)">⏱ ${tempoEsp}min</span>`}
+          </div>
+          <div style="display:flex;gap:5px">
+            <span class="badge ${prioBadge(t.prio)}">${prioLbl(t.prio)}</span>
+            <span class="badge b-pend">Aguardando</span>
+          </div>
+        </div>
+        <div class="req-meta">
+          <span><i class="fas fa-map-marker-alt"></i> <strong>${t.origem}</strong></span>
+          <span><i class="fas fa-arrow-right"></i></span>
+          <span><i class="fas fa-flag-checkered"></i> <strong>${t.destino}</strong></span>
+          ${t.equip?`<span><i class="fas fa-wheelchair"></i> ${t.equip}</span>`:''}
+          <span><i class="fas fa-user-nurse"></i> ${t.solicitante}</span>
+        </div>
+        ${t.obs?`<div style="font-size:11px;color:var(--orange);margin-bottom:8px;padding:6px;background:var(--orange-lt);border-radius:6px"><i class="fas fa-exclamation-triangle"></i> ${t.obs}</div>`:''}
+
+        <!-- SELEÇÃO DE AUXILIAR INLINE -->
+        <div style="background:var(--surface2);border-radius:8px;padding:10px;margin-top:6px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px">
+            <i class="fas fa-user-check"></i> Selecionar Auxiliar para Despacho
+          </div>
+          ${auxs.length===0?`<div style="font-size:12px;color:var(--muted)">Nenhum auxiliar cadastrado. <button class="btn btn-xs btn-primary" onclick="go('adm-cadastro')">Cadastrar</button></div>`:`
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <select class="form-select" id="sel-aux-${t.id}" style="flex:1;min-width:160px;font-size:12px">
+              <option value="">Selecionar auxiliar...</option>
+              ${auxs.map(a=>{
+                const occ=S.transportes.find(x=>x.auxId===a.id&&x.status==='active');
+                return `<option value="${a.id}" ${occ?'disabled':''}>
+                  ${a.nome} — ${occ?'🔴 Ocupado':'🟢 Disponível'}
+                </option>`;
+              }).join('')}
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="despacharDireto('${t.id}')">
+              <i class="fas fa-paper-plane"></i> Despachar
+            </button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="cancelarTransp('${t.id}')">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>`}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Em curso
+  const cursoEl = document.getElementById('curso-list');
+  if(cursoEl){
+    if(!actv.length){ cursoEl.innerHTML='<div class="empty" style="padding:16px"><i class="fas fa-check-circle"></i><p>Nenhum transporte em curso</p></div>'; }
+    else cursoEl.innerHTML = actv.map(t=>{
+      const aux=S.usuarios.find(u=>u.id===t.auxId);
+      const tempoDecorrido=Math.floor((Date.now()-(t.tsSolicitacao||t.ts))/60000);
+      const pct=Math.min(100,(tempoDecorrido/35)*100);
+      const atrasado=tempoDecorrido>35;
+      return `
+      <div class="req-card ${t.prio}" style="margin-bottom:8px${atrasado?';border:2px solid var(--red)':''}">
+        <div class="req-head">
+          <div class="req-ttl">${t.paciente}</div>
+          <div style="display:flex;gap:5px">
+            <span class="badge ${prioBadge(t.prio)}">${prioLbl(t.prio)}</span>
+            <span class="badge b-prog">Em Rota</span>
+            ${atrasado?'<span class="badge b-busy">⚠️ Atrasado</span>':''}
+          </div>
+        </div>
+        <div class="req-meta">
+          <span>📍 ${t.origem}</span>
+          <span>→</span>
+          <span>🏁 ${t.destino}</span>
+          ${aux?`<span>🚶 <strong>${aux.nome}</strong></span>`:''}
+          <span>⏱ ${tempoDecorrido}min</span>
+        </div>
+        <div class="prog-bar" style="height:6px;margin:8px 0 4px">
+          <div class="prog-fill" style="width:${pct}%;background:${atrasado?'var(--red)':pct>80?'var(--orange)':'var(--blue)'}"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:8px">
+          <span>${tempoDecorrido}min decorridos</span>
+          <span>${atrasado?'⚠️ FORA DO PRAZO':Math.max(0,35-tempoDecorrido)+'min restantes'}</span>
+        </div>
+        <div class="req-act">
+          <button class="btn btn-xs btn-success" onclick="concluirTransp('${t.id}')"><i class="fas fa-check"></i> Concluir</button>
+          <button class="btn btn-xs" style="background:var(--red-lt);color:var(--red)" onclick="abrirIncidente('${t.id}')">⚠️ Incidente</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Auxiliares
+  const auxPainel = document.getElementById('aux-painel-list');
+  if(auxPainel){
+    if(!auxs.length){ auxPainel.innerHTML=`<div class="empty" style="padding:16px"><p>Nenhum auxiliar cadastrado.</p><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="go('adm-cadastro')">+ Cadastrar Auxiliar</button></div>`; }
+    else auxPainel.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">`+
+      auxs.map(a=>{
+        const myT=S.transportes.find(t=>t.auxId===a.id&&t.status==='active');
+        const tempoRota=myT?Math.floor((Date.now()-(myT.tsSolicitacao||myT.ts))/60000):0;
+        return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:50%;background:${myT?'var(--orange)':'linear-gradient(135deg,var(--purple),var(--blue))'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;flex-shrink:0">${a.nome.charAt(0)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:12px">${a.nome}</div>
+            <div style="font-size:10px;margin-top:2px">${myT?`<span class="badge b-prog">🚶 Em Rota (${tempoRota}min)</span>`:'<span class="badge b-free">✅ Disponível</span>'}</div>
+            ${myT?`<div style="font-size:10px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${myT.origem}→${myT.destino}</div>`:''}
+          </div>
+        </div>`;
+      }).join('')+'</div>';
+  }
+}
+
+function despacharDireto(transpId){
+  const selEl=document.getElementById('sel-aux-'+transpId);
+  if(!selEl||!selEl.value){ toast('error','Selecione um auxiliar antes de despachar'); return; }
+  const auxId=selEl.value;
+  const t=S.transportes.find(x=>x.id===transpId);
+  if(!t) return;
+  const occ=S.transportes.find(x=>x.auxId===auxId&&x.status==='active');
+  if(occ){ toast('error','Este auxiliar já está em rota. Escolha outro.'); return; }
+  t.auxId=auxId; t.status='active'; t.elapsed=0; t.tsAuxSaiu=Date.now();
+  const aux=S.usuarios.find(u=>u.id===auxId);
+  saveAll();
+  addNotif('🚑 Transporte Despachado',`${t.paciente}: ${t.origem} → ${t.destino}. Auxiliar: ${aux?.nome}`,'transp_aux');
+  addNotif('Transporte em Andamento',`${t.paciente}: ${t.origem} → ${t.destino}. Auxiliar: ${aux?.nome}`,'nir');
+  addNotif('Transporte em Andamento',`${t.paciente}: ${t.origem} → ${t.destino}. Auxiliar: ${aux?.nome}`,'enfermagem');
+  toast('success',`✅ Despachado! ${aux?.nome} vai buscar ${t.paciente}`);
+  buildSidebar();
+  trPainel(document.getElementById('content'));
+}
+
+function trMiniList(id, list){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(!list.length){ el.innerHTML='<div class="empty" style="padding:16px"><i class="fas fa-check-circle"></i><p>Nenhum</p></div>'; return; }
+  el.innerHTML=list.map(t=>`
+    <div class="req-card ${t.prio}" style="margin-bottom:8px">
+      <div class="req-head">
+        <div class="req-ttl">${t.paciente}</div>
+        <span class="badge ${prioBadge(t.prio)}">${prioLbl(t.prio)}</span>
+      </div>
+      <div class="req-meta">
+        <span><i class="fas fa-map-marker-alt"></i>${t.origem}</span>
+        <span><i class="fas fa-flag-checkered"></i>${t.destino}</span>
+        <span><i class="fas fa-clock"></i>${elapsed(t.ts)}</span>
+      </div>
+      <div class="req-act">
+        ${t.status==='pending'?`<button class="btn btn-xs btn-primary" onclick="atribuirAux('${t.id}')"><i class="fas fa-user-check"></i> Atribuir</button>`:''}
+        ${t.status==='active'?`<button class="btn btn-xs btn-success" onclick="concluirTransp('${t.id}')"><i class="fas fa-check"></i> Concluir</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function auxCards(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const auxs=S.usuarios.filter(u=>u.setor==='transp_aux');
+  if(!auxs.length){ el.innerHTML='<div class="empty" style="padding:16px"><i class="fas fa-person-walking"></i><p>Nenhum auxiliar cadastrado</p></div>'; return; }
+  el.innerHTML=auxs.map(a=>{
+    const myT=S.transportes.find(t=>t.auxId===a.id&&t.status==='active');
+    return `<div class="aux-card">
+      <div class="aux-av">${a.nome.charAt(0)}</div>
+      <div class="aux-info">
+        <div class="aux-name">${a.nome}</div>
+        <div class="aux-st">${myT?'<span class="badge b-prog">Em Rota</span>':'<span class="badge b-free">Disponível</span>'}</div>
+        ${myT?`<div class="aux-loc"><i class="fas fa-map-marker-alt"></i> ${myT.origem} → ${myT.destino}</div>`:''}
+      </div>
+    </div>`;}).join('');
+}
+
+function trListar(c, filter){
+  const titles={all:'Todos os Transportes',pending:'Solicitações Pendentes',active:'Em Curso',done:'Histórico',mine:'Meus Transportes'};
+  let list=[...S.transportes];
+  if(filter==='pending') list=list.filter(t=>t.status==='pending');
+  else if(filter==='active') list=list.filter(t=>t.status==='active');
+  else if(filter==='done') list=list.filter(t=>t.status==='done');
+  else if(filter==='mine') list=list.filter(t=>t.solicitante===S.user.nome);
+  list.sort((a,b)=>({critical:0,high:1,normal:2}[a.prio]||2)-({critical:0,high:1,normal:2}[b.prio]||2)||a.ts-b.ts);
+  const isOp=S.user.setor==='transp_op'||S.user.setor==='ti';
+  c.innerHTML=`
+  <div class="page-header">
+    <div><div class="page-title">${titles[filter]||'Transportes'}</div><div class="page-subtitle">${list.length} registro(s)</div></div>
+    ${isOp&&filter!=='done'?`<button class="btn btn-primary" onclick="abrirMTransp()"><i class="fas fa-plus"></i> Nova</button>`:''}
+    ${S.user.setor==='enfermagem'&&filter==='mine'?`<button class="btn btn-primary" onclick="go('enf-sol-transp')"><i class="fas fa-plus"></i> Nova Solicitação</button>`:''}
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px" id="tr-list"></div>`;
+  const el=document.getElementById('tr-list');
+  if(!list.length){ el.innerHTML='<div class="empty"><i class="fas fa-check-circle"></i><p>Nenhum transporte</p></div>'; return; }
+  list.forEach(t=>{
+    const aux=S.usuarios.find(u=>u.id===t.auxId);
+    const canAtrib=isOp&&t.status==='pending';
+    const canConc=isOp&&t.status==='active';
+    const div=document.createElement('div');
+    div.className=`req-card ${t.prio}`;
+    div.innerHTML=`
+      <div class="req-head">
+        <div class="req-ttl"><i class="fas fa-user" style="font-size:10px;color:var(--muted)"></i> ${t.paciente}</div>
+        <div style="display:flex;gap:5px">
+          <span class="badge ${prioBadge(t.prio)}">${prioLbl(t.prio)}</span>
+          <span class="badge ${stBadge(t.status)}">${stLbl(t.status)}</span>
+        </div>
+      </div>
+      <div class="req-meta">
+        <span><i class="fas fa-map-marker-alt"></i>${t.origem}</span>
+        <span><i class="fas fa-arrow-right"></i>${t.destino}</span>
+        ${t.equip?`<span><i class="fas fa-wheelchair"></i>${t.equip}</span>`:''}
+        <span><i class="fas fa-user-nurse"></i>${t.solicitante}</span>
+        <span><i class="fas fa-clock"></i>${dt(t.ts)}</span>
+      </div>
+      ${t.obs?`<div style="font-size:11px;color:var(--orange);margin-bottom:8px"><i class="fas fa-exclamation-triangle"></i> ${t.obs}</div>`:''}
+      ${aux?`<div style="font-size:11px;color:var(--muted);margin-bottom:7px"><i class="fas fa-person-walking" style="color:var(--purple)"></i> Auxiliar: <strong>${aux.nome}</strong></div>`:''}
+      ${t.status==='active'?`<div class="prog-bar"><div class="prog-fill" style="width:${Math.min(100,(t.elapsed/900)*100)}%"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">Em rota: ${Math.floor(t.elapsed/60)}min ${t.elapsed%60}s</div>`:''}
+      <div class="req-act" style="margin-top:9px">
+        ${canAtrib?`<button class="btn btn-xs btn-primary" onclick="atribuirAux('${t.id}')"><i class="fas fa-user-check"></i> Atribuir</button>`:''}
+        ${canConc?`<button class="btn btn-xs btn-success" onclick="concluirTransp('${t.id}')"><i class="fas fa-check"></i> Concluir</button>`:''}
+        ${canAtrib?`<button class="btn btn-xs btn-danger" onclick="cancelarTransp('${t.id}')"><i class="fas fa-times"></i></button>`:''}
+        ${t.status==='done'?`<span style="font-size:10px;color:var(--muted)">Concluído em ${dt(t.tsConc)}</span>`:''}
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function abrirMTransp(){
+  ['t-pac','t-orig','t-dest','t-equip','t-obs'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  document.getElementById('t-prio').value='normal';
+  openModal('mTransp');
+}
+
+function submitTransp(){
+  const pac=gv('t-pac'),orig=gv('t-orig'),dest=gv('t-dest'),prio=gv('t-prio'),equip=gv('t-equip'),obs=gv('t-obs');
+  if(!pac||!orig||!dest){ toast('error','Preencha paciente, origem e destino'); return; }
+  if(orig===dest){ toast('error','Origem e destino não podem ser iguais'); return; }
+  S.transportes.push({id:uid(),paciente:pac,origem:orig,destino:dest,prio,status:'pending',equip,obs,solicitante:S.user.nome,setor:S.user.setor,ts:Date.now(),auxId:null,elapsed:0,tsConc:null});
+  saveAll();
+  addNotif('Nova Solicitação de Transporte',`${pac}: ${orig} → ${dest} (${prioLbl(prio)})`,'transp_op');
+  addNotif('Transporte Solicitado',`${pac}: ${orig} → ${dest}`,'nir');
+  toast('success','Solicitação enviada!');
+  closeModal('mTransp');
+  buildSidebar();
+  go(S.activeNav);
+}
+
+function atribuirAux(id){
+  S.atribId=id;
+  const t=S.transportes.find(x=>x.id===id);
+  document.getElementById('atribDesc').textContent=`Selecione o auxiliar para ${t?.paciente} — ${t?.origem} → ${t?.destino}`;
+  const auxs=S.usuarios.filter(u=>u.setor==='transp_aux');
+  const el=document.getElementById('atribList');
+  if(!auxs.length){ el.innerHTML='<div class="empty"><p>Nenhum auxiliar cadastrado.</p></div>'; }
+  else el.innerHTML=auxs.map(a=>{
+    const occ=S.transportes.find(t=>t.auxId===a.id&&t.status==='active');
+    return `<div class="aux-card">
+      <div class="aux-av">${a.nome.charAt(0)}</div>
+      <div class="aux-info">
+        <div class="aux-name">${a.nome}</div>
+        <div class="aux-st">${occ?'<span class="badge b-prog">Ocupado</span>':'<span class="badge b-free">Disponível</span>'}</div>
+        ${occ?`<div class="aux-loc">${occ.origem} → ${occ.destino}</div>`:''}
+      </div>
+      ${!occ?`<button class="btn btn-xs btn-primary" onclick="confirmarAtrib('${a.id}')">Atribuir</button>`:`<button class="btn btn-xs btn-outline" disabled>Ocupado</button>`}
+    </div>`;}).join('');
+  openModal('mAtrib');
+}
+
+function confirmarAtrib(auxId){
+  const t=S.transportes.find(x=>x.id===S.atribId);
+  if(!t) return;
+  t.auxId=auxId; t.status='active'; t.elapsed=0;
+  const aux=S.usuarios.find(u=>u.id===auxId);
+  saveAll();
+  addNotif('Transporte Atribuído',`${t.paciente}: ${t.origem} → ${t.destino}. Auxiliar: ${aux?.nome}`,'transp_aux');
+  addNotif('Transporte em Andamento',`${t.paciente}: ${t.origem} → ${t.destino}`,'nir');
+  addNotif('Transporte em Andamento',`${t.paciente}: ${t.origem} → ${t.destino}. Auxiliar: ${aux?.nome}`,'enfermagem');
+  toast('success',`Atribuído a ${aux?.nome}!`);
+  closeModal('mAtrib');
+  go(S.activeNav);
+}
+
+function concluirTransp(id){
+  const t=S.transportes.find(x=>x.id===id);
+  if(!t) return;
+  t.status='done'; t.tsConc=Date.now();
+  const leito=S.leitos.find(l=>l.num===t.origem);
+  if(leito&&leito.status==='busy'){
+    leito.status='cleaning'; leito.cleanTs=Date.now(); leito.paciente='';
+    S.hotelaria.push({id:uid(),tipo:'terminal',tipoLabel:'Limpeza Terminal',leito:leito.num,prio:'high',obs:`Alta/Transporte: ${t.paciente}`,status:'pending',solicitante:'Sistema',ts:Date.now(),tsConc:null});
+    addNotif('Higienização Necessária',`Leito ${leito.num} aguarda limpeza após transporte de ${t.paciente}`,'hotelaria');
+    addNotif('Leito em Higienização',`Leito ${leito.num} aguarda limpeza. NIR será notificado.`,'nir');
+  }
+  addNotif('Transporte Concluído',`${t.paciente} chegou em ${t.destino}`,'enfermagem');
+  addNotif('Transporte Concluído',`${t.paciente} chegou em ${t.destino}. Leito ${t.origem} em higienização.`,'nir');
+  saveAll(); toast('success',`Transporte de ${t.paciente} concluído!`);
+  buildSidebar(); go(S.activeNav);
+}
+
+function cancelarTransp(id){
+  if(!confirm('Cancelar esta solicitação de transporte?')) return;
+  const t=S.transportes.find(x=>x.id===id);
+  if(t){ t.status='cancelled'; saveAll(); toast('info','Solicitação cancelada'); go(S.activeNav); }
+}
+
+function trAuxiliares(c){
+  const auxs=S.usuarios.filter(u=>u.setor==='transp_aux');
+  c.innerHTML=`
+  <div class="page-header">
+    <div><div class="page-title">Auxiliares de Transporte</div><div class="page-subtitle">${auxs.length} auxiliar(es) cadastrado(s)</div></div>
+    <button class="btn btn-primary" onclick="go('adm-cadastro')"><i class="fas fa-user-plus"></i> Cadastrar Auxiliar</button>
+  </div>
+  <div class="card">
+    ${auxs.map(a=>{
+      const myT=S.transportes.find(t=>t.auxId===a.id&&t.status==='active');
+      return `<div class="aux-card">
+        <div class="aux-av">${a.nome.charAt(0)}</div>
+        <div class="aux-info">
+          <div class="aux-name">${a.nome}</div>
+          <div class="aux-st">${myT?'<span class="badge b-prog">Em Rota</span>':'<span class="badge b-free">Disponível</span>'}</div>
+          ${myT?`<div class="aux-loc"><i class="fas fa-map-marker-alt"></i> ${myT.origem} → ${myT.destino}: ${myT.paciente}</div>`:''}
+        </div>
+      </div>`;}).join('')||'<div class="empty"><i class="fas fa-person-walking"></i><p>Nenhum auxiliar</p></div>'}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   AUXILIAR DE TRANSPORTE
+══════════════════════════════
